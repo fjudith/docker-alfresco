@@ -211,7 +211,7 @@ function tweak_alfresco {
 }
 
 function set_reverse_proxy {
-  if [ -z $REVERSE_PROXY_URL]; then
+  if [ -z $REVERSE_PROXY_URL ]; then
     echo "INFO: Reverse proxy not configured"
   else
     echo "INFO: Configuring alfresco for independant reverse-proxy support"
@@ -257,7 +257,7 @@ fi
 source $ALF_HOME/scripts/setenv.sh
 
 # Fix Libreoffice startup
-if [[ ! -f /alfresco/postgresql/scripts/ctl.sh.disabled ]]: then
+if [[ ! -f /alfresco/postgresql/scripts/ctl.sh.disabled ]]; then
   sed -e 's/\\;/;/g' /alfresco/libreoffice/scripts/libreoffice_ctl.sh > /alfresco/libreoffice/scripts/ctl.sh && \
   chmod +x /alfresco/libreoffice/scripts/ctl.sh && \
   mv -f /alfresco/postgresql/scripts/ctl.sh /alfresco/postgresql/scripts/ctl.sh.disabled
