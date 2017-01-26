@@ -4,8 +4,8 @@ set -e
 
 # vars
 ALF_HOME=/alfresco
-ALF_BUILD=201612-build-00014
-ALF_BIN=alfresco-community-installer-201612-linux-x64.bin
+ALF_BUILD=201701-build-00015
+ALF_BIN=alfresco-community-installer-201701-linux-x64.bin
 
 # get alfresco installer
 mkdir -p $ALF_HOME
