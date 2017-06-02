@@ -1,11 +1,10 @@
 #!/bin/bash
 set -e
 
-
 # vars
 ALF_HOME=/alfresco
-ALF_BUILD=201702-build-00016
-ALF_BIN=alfresco-community-installer-201702-linux-x64.bin
+ALF_BUILD=201704-build-00019
+ALF_BIN=alfresco-community-installer-201704-linux-x64.bin
 
 # get alfresco installer
 mkdir -p $ALF_HOME
