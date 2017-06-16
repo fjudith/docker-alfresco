@@ -182,4 +182,4 @@ http://<node-ip>:<port>/share
 
 You should see the familiar Alfresco login page.
 
-![Waarp-R66 login page](https://github.com/fjudith/docker-alfresco/raw/master/kubernetes/Alfresco.png)
+![Waarp-R66 login page](https://github.com/fjudith/docker-alfresco/raw/201704/kubernetes/Alfresco.png)
