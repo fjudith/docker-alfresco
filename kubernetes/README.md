@@ -1,7 +1,7 @@
 Persistent Installation of PostgreSQL and Alfresco on Kubernetes
 ===
 
-this example describes how to run a persistent installation of [Alfresco Community Edition]() and [PostgreSQL]() on Kubernetes. We'll use the official official [postgres]() and [alfresco]() Docker images for this installation.
+this example describes how to run a persistent installation of [Alfresco Community Edition](https://community.alfresco.com/) and [PostgreSQL](https://www.postgresql.org/) on Kubernetes. We'll use the official official [postgres](https://hub.docker.com/_/postgres/) and [Alfresco](https://hub.docker.com/r/fjudith/alfresco/) [Docker](https://www.docker.com) images for this installation.
 
 Demonstrated Kubernetes Concepts:
 
@@ -61,7 +61,7 @@ We have three options are available to solve this issue:
 3. **Create user and group in the node**, with the exact same `name`, `uid`, `gid` and change ownership of the Persistent Volume.
    * Secure but requires more administrative effort (_i.e._ stateless run to identify user attributes, add user to the node, pre-create persistent volume path with appropriate ownership. Thus create the pod).
 
-We will none of these options in this guide as the [Alfresco]() image runs as `root` user.
+We will **none** of these options in this guide as the [Alfresco]() image runs as `root` user.
 
 #### SELinux
 
