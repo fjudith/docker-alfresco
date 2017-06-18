@@ -1,0 +1,87 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: alfresco-db
+  labels:
+    app: alfresco
+    tiers: backend
+    type: distributed    
+spec:
+  capacity:
+    storage: 20Gi    
+  accessModes:
+    - ReadWriteOnce
+  cephfs:
+    monitors:
+#This only works if you have skyDNS resolveable from the kubernetes node. Otherwise you must manually put in one or more mon pod ips.
+    - ceph-mon.ceph.svc.cluster.local:6789
+    user: admin
+    secretRef:
+      name: ceph-client-key
+status: {}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: alfresco-dblog
+  labels:
+    app: alfresco
+    tiers: backend
+    type: distributed    
+spec:
+  capacity:
+    storage: 20Gi    
+  accessModes:
+    - ReadWriteOnce
+  cephfs:
+    monitors:
+#This only works if you have skyDNS resolveable from the kubernetes node. Otherwise you must manually put in one or more mon pod ips.
+    - ceph-mon.ceph.svc.cluster.local:6789
+    user: admin
+    secretRef:
+      name: ceph-client-key
+status: {}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: alfresco-data
+  labels:
+    app: alfresco
+    tiers: frontend
+    type: distributed    
+spec:
+  capacity:
+    storage: 20Gi    
+  accessModes:
+    - ReadWriteOnce
+  cephfs:
+    monitors:
+#This only works if you have skyDNS resolveable from the kubernetes node. Otherwise you must manually put in one or more mon pod ips.
+    - ceph-mon.ceph.svc.cluster.local:6789
+    user: admin
+    secretRef:
+      name: ceph-client-key
+status: {}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: alfresco-log
+  labels:
+    app: alfresco
+    tiers: frontend
+    type: distributed    
+spec:
+  capacity:
+    storage: 20Gi    
+  accessModes:
+    - ReadWriteOnce
+  cephfs:
+    monitors:
+#This only works if you have skyDNS resolveable from the kubernetes node. Otherwise you must manually put in one or more mon pod ips.
+    - ceph-mon.ceph.svc.cluster.local:6789
+    user: admin
+    secretRef:
+      name: ceph-client-key
+status: {}
