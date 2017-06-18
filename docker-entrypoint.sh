@@ -19,13 +19,13 @@ DB_PASSWORD=${DB_PASSWORD:-admin}
 DB_NAME=${DB_NAME:-alfresco}
 DB_HOST=${DB_HOST:-localhost}
 
-if [[ $DB_KIND == 'mysql' ]]; then
+if [ "$DB_KIND" == "mysql" ]; then
     DB_DRIVER=org.gjt.mm.mysql.Driver
     DB_PORT=${DB_PORT:-3306}
     DB_CONN_PARAMS=${DB_CONN_PARAMS:-?useSSL=false}
 fi
 
-if [[ $DB_KIND == 'postgresql' ]]; then
+if [ "$DB_KIND" == "postgresql" ]; then
     DB_DRIVER=org.postgresql.Driver
     DB_PORT=${DB_PORT:-5432}
 fi
