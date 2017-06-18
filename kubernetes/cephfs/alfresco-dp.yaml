@@ -189,7 +189,7 @@ spec:
         tiers: frontend
     spec:
       containers:
-      - image: fjudith/alfresco:latest
+      - image: fjudith/alfresco:201704
         name: alfresco
         env: 
         - name: DB_KIND
