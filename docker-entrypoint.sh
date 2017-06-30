@@ -242,6 +242,21 @@ function set_reverse_proxy {
     cfg_replace_option alfresco.protocol $ALFRESCO_PROTOCOL $ALFRESCO_GLOBAL_PROPERTIES
     cfg_replace_option share.host $SHARE_HOSTNAME $ALFRESCO_GLOBAL_PROPERTIES
     cfg_replace_option share.protocol $SHARE_PROTOCOL $ALFRESCO_GLOBAL_PROPERTIES
+
+    xmlstarlet ed  \
+    -P -S -L \
+    -i '/alfresco-config/config[@condition="CSRFPolicy" and not(@replace)]' \
+    -t 'attr' -n 'replace' -v 'true' \
+    -s '/alfresco-config/config[@condition="CSRFPolicy"]/filter/rule/action[@name="assertOrigin"]' \
+    -t 'elem' -n 'param' -v "$REVERSE_PROXY_URL" \
+    -i '/alfresco-config/config[@condition="CSRFPolicy"]/filter/rule/action[@name="assertOrigin"]/param[not(@name)]' \
+    -t 'attr' -n 'name' -v 'origin' \
+    -s '/alfresco-config/config[@condition="CSRFPolicy"]/filter/rule/action[@name="assertReferer"]' \
+    -t 'elem' -n 'param' -v "$REVERSE_PROXY_URL/.*" \
+    -i '/alfresco-config/config[@condition="CSRFPolicy"]/filter/rule/action[@name="assertReferer"]/param[not(@name)]' \
+    -t 'attr' -n 'name' -v 'referer' \
+    $CATALINA_HOME/shared/classes/alfresco/web-extension/share-config-custom.xml
+  
   fi
 }
 

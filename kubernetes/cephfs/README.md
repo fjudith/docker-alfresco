@@ -2,7 +2,7 @@ CephFS persistent installation of PostgreSQL and Alfresco on Kubernetes
 ===
 
 this example describes how to run a persistent installation of [Alfresco Community Edition](https://community.alfresco.com/) and [PostgreSQL](https://www.postgresql.org/) on Kubernetes. We'll use the official official [postgres](https://hub.docker.com/_/postgres/) and [Alfresco](https://hub.docker.com/r/fjudith/alfresco/) [Docker](https://www.docker.com) images for this installation.
-Persistent storage will be provided by Kubernetes [cephfs pod](https://github.com/ceph/ceph-docker) to bring a high fault tolerance level.
+Storage will be provided by Kubernetes [Ceph Filesystem](https://github.com/ceph/ceph-docker) to bring fault tolerance to Pods persistent data.
 
 Demonstrated Kubernetes Concepts:
 
@@ -188,7 +188,37 @@ kubectl get deployment,pod,svc,endpoints,pvc -l app=alfresco -o wide && \
 ```
 
 ```
-                    
+NAME                 DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE       CONTAINER(S)   IMAGE(S)                  SELECTOR
+deploy/alfresco      1         1         1            0           8m        alfresco       fjudith/alfresco:201704   app=alfresco,tiers=frontend
+deploy/alfresco-pg   1         1         1            0           8m        alfresco-pg    postgres                  app=alfresco,tiers=backend
+
+NAME                              READY     STATUS                                       RESTARTS   AGE       IP
+    NODE
+po/alfresco-543271007-ngcgj       0/1       ContainerCreating                            0          8m        <none>
+    192.168.251.205
+po/alfresco-pg-3659509345-z5395   0/1       secrets "alfresco-postgres-pass" not found   0          8m        10.2.64.10   192.168.251.205
+
+NAME              CLUSTER-IP   EXTERNAL-IP   PORT(S)
+            AGE       SELECTOR
+svc/alfresco      10.3.0.196   <nodes>       137:31977/UDP,138:30871/UDP,139:32703/TCP,21:32474/TCP,445:30952/TCP,8080:30561/TCP   8m        app=alfresco,tiers=frontend
+svc/alfresco-pg   10.3.0.251   <nodes>       5432:30412/TCP            8m        app=alfresco,tiers=backend
+
+NAME             ENDPOINTS   AGE
+ep/alfresco      <none>      8m
+ep/alfresco-pg               8m
+
+NAME                 STATUS    VOLUME           CAPACITY   ACCESSMODES   STORAGECLASS   AGE
+pvc/alfresco-data    Bound     alfresco-data    20Gi       RWX                          8m
+pvc/alfresco-db      Bound     alfresco-db      20Gi       RWX                          8m
+pvc/alfresco-dblog   Bound     alfresco-dblog   20Gi       RWX                          8m
+pvc/alfresco-log     Bound     alfresco-log     20Gi       RWX                          8m
+NAME                     TYPE      DATA      AGE
+alfresco-postgres-pass   Opaque    1         31s
+NAME             CAPACITY   ACCESSMODES   RECLAIMPOLICY   STATUS    CLAIM                    STORAGECLASS   REASON    AGE
+alfresco-data    20Gi       RWX           Retain          Bound     default/alfresco-data                             8m
+alfresco-db      20Gi       RWX           Retain          Bound     default/alfresco-db                               8m
+alfresco-dblog   20Gi       RWX           Retain          Bound     default/alfresco-dblog                            8m
+alfresco-log     20Gi       RWX           Retain          Bound     default/alfresco-log                              8m            
 ```
 
 # Visit your new Alfresco
