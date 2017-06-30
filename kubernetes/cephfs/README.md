@@ -81,12 +81,6 @@ sudo mkdir -p \
   /var/lib/kubernetes/pv/alfresco-data/data \
   /var/lib/kubernetes/pv/alfresco-log/log
 
-sudo chown -R waarp:waarp \
-  /var/lib/kubernetes/pv/alfresco-db/db \
-  /var/lib/kubernetes/pv/alfresco-dblog/log \
-  /var/lib/kubernetes/pv/alfresco-data/data \
-  /var/lib/kubernetes/pv/alfresco-log/log
-
 sudo chcon -Rt svirt_sandbox_file_t /var/lib/kubernetes/pv
 ```
 
@@ -96,6 +90,28 @@ Continuing with host path, create the persistent volume objects in Kubernetes us
 export KUBE_REPO=https://raw.githubusercontent.com/fjudith/docker-alfresco/master/kubernetes
 kubectl create -f $KUBE_REPO/alfresco-pv.yaml
 ```
+
+### CephFS
+
+CephFS is the POSIX-compliant filesystem used to store data in a Ceph Storage Cluster. 
+It will be exposed to Kubernetes as [Persistent Volumes](http://kubernetes.io/docs/user-guide/persistent-volumes/) to be claimed and Mounted by PostgreSQL & Alfresco Pods via [Persistent Volume Claims](http://kubernetes.io/docs/user-guide/persistent-volumes/). **This is the recommanded approach for production** as the data will be available accross all nodes, unlocking stateful container capabilities accross the cluster. Then if the pod is recreated, **data will automatically be retreived**.
+
+```bash
+kubectl create -f $KUBE_REPO/cephfs/alfresco-pv.yaml
+
+kubectl get pv -o wide
+```
+
+```
+kubectl get pv -o wide
+NAME             CAPACITY   ACCESSMODES   RECLAIMPOLICY   STATUS      CLAIM     STORAGECLASS   REASON    AGE
+alfresco-data    20Gi       RWO           Retain          Available                                      31s
+alfresco-db      20Gi       RWO           Retain          Available                                      32s
+alfresco-dblog   20Gi       RWO           Retain          Available                                      32s
+alfresco-log     20Gi       RWO           Retain          Available                                      30s
+```
+
+## Create Secrets
 
 Use [Secret](http://kubernetes.io/docs/user-guide/secrets/) objects to store the PostgreSQL passwords. First create respective files (in the same directory as the Alfresco sample files) called `alfresco.postgres.password.txt`, then save your password in it. Make sure to not have a trailing newline at the end of the password. The first `tr` command will remove the newline if your editor added one. Then, create the Secret object.
 
@@ -112,7 +128,7 @@ The Alfresco password is not referenced by the Alfresco pod configuration as it 
 
 ## Deploy PostgreSQL and Alfresco
 
-Now that the persistent disks and secrets are defined, the Kubernetes pods can be launched. Start PostgresSQL using [waarp-r66-pg-deployment.yaml](https://github.com/fjudith/docker-waarp-r66/tree/master/kubernetes/waarp-r66-pg-deployment.yaml).
+Now that the persistent disks and secrets are defined, the Kubernetes pods can be launched. Start PostgresSQL using [alfresco-dp.yaml](https://github.com/fjudith/docker-alfresco/tree/master/kubernetes/cephfs/alfresco-dp.yaml).
 
 ```bash
 kubectl create -f $KUBE_REPO/alfresco-dp.yaml

@@ -78,12 +78,6 @@ sudo mkdir -p \
   /var/lib/kubernetes/pv/alfresco-data/data \
   /var/lib/kubernetes/pv/alfresco-log/log
 
-sudo chown -R waarp:waarp \
-  /var/lib/kubernetes/pv/alfresco-db/db \
-  /var/lib/kubernetes/pv/alfresco-dblog/log \
-  /var/lib/kubernetes/pv/alfresco-data/data \
-  /var/lib/kubernetes/pv/alfresco-log/log
-
 sudo chcon -Rt svirt_sandbox_file_t /var/lib/kubernetes/pv
 ```
 
@@ -109,7 +103,7 @@ The Alfresco password is not referenced by the Alfresco pod configuration as it 
 
 ## Deploy PostgreSQL and Alfresco
 
-Now that the persistent disks and secrets are defined, the Kubernetes pods can be launched. Start PostgresSQL using [waarp-r66-pg-deployment.yaml](https://github.com/fjudith/docker-waarp-r66/tree/master/kubernetes/waarp-r66-pg-deployment.yaml).
+Now that the persistent disks and secrets are defined, the Kubernetes pods can be launched. Start PostgresSQL using [alfresco-dp.yaml](https://github.com/fjudith/docker-alfresco/tree/master/kubernetes/alfresco-dp.yaml).
 
 ```bash
 kubectl create -f $KUBE_REPO/alfresco-dp.yaml

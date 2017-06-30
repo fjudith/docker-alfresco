@@ -14,6 +14,8 @@ SHARE_PROTOCOL=${SHARE_PROTOCOL:-http}
 SHARE_PORT=${SHARE_PORT:-8080}
 
 DB_KIND=${DB_KIND:-postgresql}
+DB_DRIVER=${DB_DRIVER:-org.postgresql.Driver}
+DB_PORT=${DB_PORT:-5432}
 DB_USERNAME=${DB_USERNAME:-alfresco}
 DB_PASSWORD=${DB_PASSWORD:-admin}   
 DB_NAME=${DB_NAME:-alfresco}
@@ -23,11 +25,6 @@ if [ "$DB_KIND" == "mysql" ]; then
     DB_DRIVER=org.gjt.mm.mysql.Driver
     DB_PORT=${DB_PORT:-3306}
     DB_CONN_PARAMS=${DB_CONN_PARAMS:-?useSSL=false}
-fi
-
-if [ "$DB_KIND" == "postgresql" ]; then
-    DB_DRIVER=org.postgresql.Driver
-    DB_PORT=${DB_PORT:-5432}
 fi
 
 # if we're linked to MySQL and thus have credentials already, let's use them

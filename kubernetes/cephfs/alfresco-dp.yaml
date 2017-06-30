@@ -62,7 +62,7 @@ metadata:
   name: alfresco-data
 spec:
   accessModes:
-  - ReadWriteOnce
+  - ReadWriteMany
   resources:
     requests:
       storage: 10Gi
@@ -80,7 +80,7 @@ metadata:
   name: alfresco-log
 spec:
   accessModes:
-  - ReadWriteOnce
+  - ReadWriteMany
   resources:
     requests:
       storage: 10Gi
@@ -98,7 +98,7 @@ metadata:
   name: alfresco-db
 spec:
   accessModes:
-  - ReadWriteOnce
+  - ReadWriteMany
   resources:
     requests:
       storage: 10Gi
@@ -116,7 +116,7 @@ metadata:
   name: alfresco-dblog
 spec:
   accessModes:
-  - ReadWriteOnce
+  - ReadWriteMany
   resources:
     requests:
       storage: 1Gi
@@ -227,6 +227,15 @@ spec:
         - mountPath: /alfresco/tomcat/logs
           name: alfresco-log
           subPath: log
+        livenessProbe:
+              tcpSocket:
+                port: 8080
+              initialDelaySeconds: 60
+              timeoutSeconds: 5
+          readinessProbe:
+              tcpSocket:
+                port: 8080
+              timeoutSeconds: 5
       volumes:
       - name: alfresco-data
         persistentVolumeClaim:
