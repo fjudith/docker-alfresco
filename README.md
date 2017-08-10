@@ -16,7 +16,9 @@ This image aims to help you run the latest version of the Alfresco Community Edi
 
 ### Roadmap
 
-* [ ] Implement support of Reverse-proxy via environmnet variable
+* [ ] Implement option to disable CSRF
+* [x] Added Kubernetes example (Hostpath & CephFS)
+* [x] Implement support of Reverse-proxy via environmnet variable
 * [x] Database connection autoconf when using `--link` (supported aliases _mysql_, _postgres_)
 * [x] Markdown Manual support using `manual manager`add-on
 * [x] Markdown Document support using `md-preview` add-on
@@ -186,4 +188,8 @@ docker build --tag="$(echo $USERNAME | awk '{print tolower($0)}')/alfresco" .
 * http://www.alfresco.com/community
 * http://docs.alfresco.com/community/concepts/welcome-infocenter_community.html
 * https://addons.alfresco.com/addons/manual-manager-write-and-manage-documents-written-markdown
+<<<<<<< HEAD
 *  https://addons.alfresco.com/addons/markdown-preview
+=======
+* https://addons.alfresco.com/addons/markdown-preview
+>>>>>>> 201704

@@ -14,11 +14,18 @@ SHARE_PROTOCOL=${SHARE_PROTOCOL:-http}
 SHARE_PORT=${SHARE_PORT:-8080}
 
 DB_KIND=${DB_KIND:-postgresql}
+DB_DRIVER=${DB_DRIVER:-org.postgresql.Driver}
+DB_PORT=${DB_PORT:-5432}
 DB_USERNAME=${DB_USERNAME:-alfresco}
-DB_PASSWORD=${DB_PASSWORD:-admin}
+DB_PASSWORD=${DB_PASSWORD:-admin}   
 DB_NAME=${DB_NAME:-alfresco}
 DB_HOST=${DB_HOST:-localhost}
 
+if [ "$DB_KIND" == "mysql" ]; then
+    DB_DRIVER=org.gjt.mm.mysql.Driver
+    DB_PORT=${DB_PORT:-3306}
+    DB_CONN_PARAMS=${DB_CONN_PARAMS:-?useSSL=false}
+fi
 
 # if we're linked to MySQL and thus have credentials already, let's use them
 if [[ -v MYSQL_ENV_GOSU_VERSION ]]; then
@@ -225,7 +232,7 @@ function set_reverse_proxy {
     # Alfresco Office Service URL rewrite
     cfg_replace_option aos.baseUrlOverwrite $REVERSE_PROXY_URL/alfresco/aos $ALFRESCO_GLOBAL_PROPERTIES
 
-    # Alfresco URL rewrite (i.e share link, email link)
+    # Alfresco URL rewrite (i.e alfresco and share links found in emails)
     ALFRECO_HOSTNAME=`echo "$REVERSE_PROXY_URL" | awk '{split($0,a,"://"); print a[2]}'`
     ALFRECO_PROTOCOL=`echo "$REVERSE_PROXY_URL" | awk '{split($0,a,"://"); print a[1]}'`
     SHARE_HOSTNAME=`echo "$REVERSE_PROXY_URL" | awk '{split($0,a,"://"); print a[2]}'`
@@ -235,6 +242,21 @@ function set_reverse_proxy {
     cfg_replace_option alfresco.protocol $ALFRESCO_PROTOCOL $ALFRESCO_GLOBAL_PROPERTIES
     cfg_replace_option share.host $SHARE_HOSTNAME $ALFRESCO_GLOBAL_PROPERTIES
     cfg_replace_option share.protocol $SHARE_PROTOCOL $ALFRESCO_GLOBAL_PROPERTIES
+
+    xmlstarlet ed  \
+    -P -S -L \
+    -i '/alfresco-config/config[@condition="CSRFPolicy" and not(@replace)]' \
+    -t 'attr' -n 'replace' -v 'true' \
+    -s '/alfresco-config/config[@condition="CSRFPolicy"]/filter/rule/action[@name="assertOrigin"]' \
+    -t 'elem' -n 'param' -v "$REVERSE_PROXY_URL" \
+    -i '/alfresco-config/config[@condition="CSRFPolicy"]/filter/rule/action[@name="assertOrigin"]/param[not(@name)]' \
+    -t 'attr' -n 'name' -v 'origin' \
+    -s '/alfresco-config/config[@condition="CSRFPolicy"]/filter/rule/action[@name="assertReferer"]' \
+    -t 'elem' -n 'param' -v "$REVERSE_PROXY_URL/.*" \
+    -i '/alfresco-config/config[@condition="CSRFPolicy"]/filter/rule/action[@name="assertReferer"]/param[not(@name)]' \
+    -t 'attr' -n 'name' -v 'referer' \
+    $CATALINA_HOME/shared/classes/alfresco/web-extension/share-config-custom.xml
+  
   fi
 }
 

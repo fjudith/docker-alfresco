@@ -1,0 +1,246 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: alfresco
+    tiers: frontend
+  name: alfresco
+spec:
+  ports:
+  - name: netbios-ns
+    port: 137
+    targetPort: 137
+    protocol: UDP
+  - name: netbios-dgm
+    port: 138
+    targetPort: 138
+    protocol: UDP
+  - name: netbios-ssn
+    port: 139
+    targetPort: 139
+    protocol: TCP
+  - name: ftp
+    port: 21
+    targetPort: 21
+    protocol: TCP
+  - name: microsoft-ds
+    port: 445
+    targetPort: 445
+    protocol: TCP
+  - name: http-proxy
+    port: 8080
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app: alfresco
+    tiers: frontend
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: alfresco
+    tiers: backend
+  name: alfresco-pg
+spec:
+  ports:
+  - name: posgressql
+    port: 5432
+    targetPort: 5432
+    protocol: TCP
+  selector:
+    app: alfresco
+    tiers: backend
+  type: NodePort
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: alfresco
+  name: alfresco-data
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 20Gi
+  selector:
+    matchLabels:
+      app: alfresco
+      tiers: frontend
+status: {}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: alfresco
+  name: alfresco-log
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 20Gi
+  selector:
+    matchLabels:
+      app: alfresco
+      tiers: frontend
+status: {}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: alfresco
+  name: alfresco-db
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 20Gi
+  selector:
+    matchLabels:
+      app: alfresco
+      tiers: backend
+status: {}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: alfresco
+  name: alfresco-dblog
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 20Gi
+  selector:
+    matchLabels:
+      app: alfresco
+      tiers: backend
+status: {}
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: alfresco-pg
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: alfresco
+        tiers: backend
+    spec:
+      containers:
+      - image: postgres
+        name: alfresco-pg
+        env:
+        - name: POSTGRES_DB
+          value: alfresco
+        - name: POSTGRES_USER
+          value: alfresco
+        # $ kubectl create secret generic postgres-pass --from-file=alfresco.postgres.password.txt
+        # make sure postgres.password.txt does not have a trailing newline
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: alfresco-pass
+              key: alfresco.postgres.password.txt
+        ports:
+        - containerPort: 5432
+          name: postgres
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: alfresco-db
+          subPath: db
+        - mountPath: /var/log/postgresql
+          name: alfresco-dblog
+          subPath: dblog
+      volumes:
+      - name: alfresco-db
+        persistentVolumeClaim:
+          claimName: alfresco-db
+      - name: alfresco-dblog
+        persistentVolumeClaim:
+          claimName: alfresco-dblog
+status: {}
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: alfresco
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: alfresco
+        tiers: frontend
+    spec:
+      containers:
+      - image: fjudith/alfresco:201704
+        name: alfresco
+        env: 
+        - name: DB_KIND
+          value: postgresql
+        - name: DB_HOST
+          value: alfresco-pg
+        - name: DB_NAME
+          value: alfresco
+        - name: DB_USERNAME
+          value: alfresco
+        # $ kubectl create secret generic postgres-pass --from-file=alfresco.postgres.password.txt
+        # make sure postgres.password.txt does not have a trailing newline
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: alfresco-pass
+              key: alfresco.postgres.password.txt
+        ports:
+        - containerPort: 137
+          name: netbios-ns
+        - containerPort: 138
+          name: netbios-dgm
+        - containerPort: 139
+          name: netbios-ssn
+        - containerPort: 21
+          name: ftp
+        - containerPort: 445
+          name: microsoft-ds
+        - containerPort: 8080
+          name: http-proxy
+        volumeMounts:
+        - mountPath: /alfresco/alf_data
+          name: alfresco-data
+          subPath: data
+        - mountPath: /alfresco/tomcat/logs
+          name: alfresco-log
+          subPath: log
+        livenessProbe:
+          tcpSocket:
+              port: 8080
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          timeoutSeconds: 5
+      volumes:
+      - name: alfresco-data
+        persistentVolumeClaim:
+          claimName: alfresco-data
+      - name: alfresco-log
+        persistentVolumeClaim:
+          claimName: alfresco-log
+status: {}
