@@ -2,7 +2,8 @@
 
 # Supported tags and respective Dockerfile links
 
-[`201704`, `latest`](https://github.com/fjudith/docker-alfresco/tree/201704)
+[`201707`, `latest`](https://github.com/fjudith/docker-alfresco/tree/201707)
+[`201704`](https://github.com/fjudith/docker-alfresco/tree/201704)
 [`201702`](https://github.com/fjudith/docker-alfresco/tree/201702)
 [`201701`](https://github.com/fjudith/docker-alfresco/tree/201701)
 [`201612`](https://github.com/fjudith/docker-alfresco/tree/201612)
@@ -188,8 +189,4 @@ docker build --tag="$(echo $USERNAME | awk '{print tolower($0)}')/alfresco" .
 * http://www.alfresco.com/community
 * http://docs.alfresco.com/community/concepts/welcome-infocenter_community.html
 * https://addons.alfresco.com/addons/manual-manager-write-and-manage-documents-written-markdown
-<<<<<<< HEAD
-*  https://addons.alfresco.com/addons/markdown-preview
-=======
 * https://addons.alfresco.com/addons/markdown-preview
->>>>>>> 201704
