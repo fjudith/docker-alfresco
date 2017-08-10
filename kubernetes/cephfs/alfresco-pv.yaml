@@ -7,13 +7,14 @@ metadata:
     tiers: backend
     type: distributed    
 spec:
+  persistentVolumeReclaimPolicy: Recycle
   capacity:
     storage: 20Gi    
   accessModes:
     - ReadWriteMany
   cephfs:
     monitors:
-#This only works if you have skyDNS resolveable from the kubernetes node. Otherwise you must manually put in one or more mon pod ips.
+#This only works if you have Kube-DNS/skyDNS resolveable from the kubernetes node. Otherwise you must manually put in one or more mon pod ips.
     - ceph-mon.ceph:6789
     user: admin
     secretRef:
@@ -29,13 +30,14 @@ metadata:
     tiers: backend
     type: distributed    
 spec:
+  persistentVolumeReclaimPolicy: Recycle
   capacity:
     storage: 20Gi    
   accessModes:
     - ReadWriteMany
   cephfs:
     monitors:
-#This only works if you have skyDNS resolveable from the kubernetes node. Otherwise you must manually put in one or more mon pod ips.
+#This only works if you have Kube-DNS/skyDNS resolveable from the kubernetes node. Otherwise you must manually put in one or more mon pod ips.
     - ceph-mon.ceph:6789
     user: admin
     secretRef:
@@ -51,13 +53,14 @@ metadata:
     tiers: frontend
     type: distributed    
 spec:
+  persistentVolumeReclaimPolicy: Recycle
   capacity:
     storage: 20Gi    
   accessModes:
     - ReadWriteMany
   cephfs:
     monitors:
-#This only works if you have skyDNS resolveable from the kubernetes node. Otherwise you must manually put in one or more mon pod ips.
+#This only works if you have Kube-DNS/skyDNS resolveable from the kubernetes node. Otherwise you must manually put in one or more mon pod ips.
     - ceph-mon.ceph:6789
     user: admin
     secretRef:
@@ -73,13 +76,14 @@ metadata:
     tiers: frontend
     type: distributed    
 spec:
+  persistentVolumeReclaimPolicy: Recycle
   capacity:
     storage: 20Gi    
   accessModes:
     - ReadWriteMany
   cephfs:
     monitors:
-#This only works if you have skyDNS resolveable from the kubernetes node. Otherwise you must manually put in one or more mon pod ips.
+#This only works if you have Kube-DNS/skyDNS resolveable from the kubernetes node. Otherwise you must manually put in one or more mon pod ips.
     - ceph-mon.ceph:6789
     user: admin
     secretRef:

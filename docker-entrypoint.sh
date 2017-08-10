@@ -232,7 +232,7 @@ function set_reverse_proxy {
     # Alfresco Office Service URL rewrite
     cfg_replace_option aos.baseUrlOverwrite $REVERSE_PROXY_URL/alfresco/aos $ALFRESCO_GLOBAL_PROPERTIES
 
-    # Alfresco URL rewrite (i.e share link, email link)
+    # Alfresco URL rewrite (i.e alfresco and share links found in emails)
     ALFRECO_HOSTNAME=`echo "$REVERSE_PROXY_URL" | awk '{split($0,a,"://"); print a[2]}'`
     ALFRECO_PROTOCOL=`echo "$REVERSE_PROXY_URL" | awk '{split($0,a,"://"); print a[1]}'`
     SHARE_HOSTNAME=`echo "$REVERSE_PROXY_URL" | awk '{split($0,a,"://"); print a[2]}'`
