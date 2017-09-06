@@ -158,6 +158,7 @@ function tweak_alfresco {
   cfg_replace_option db.url jdbc:${DB_KIND,,}://${DB_HOST}:${DB_PORT}/${DB_NAME}${DB_CONN_PARAMS} $ALFRESCO_GLOBAL_PROPERTIES
 
   cfg_replace_option ftp.port $FTP_PORT $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option ooo.enabled $OOO_ENABLED $ALFRESCO_GLOBAL_PROPERTIES
 
   # @see https://forums.alfresco.com/en/viewtopic.php?f=8&t=20893
   # CIFS works, but you have to login as a native Alfresco account, like admin
