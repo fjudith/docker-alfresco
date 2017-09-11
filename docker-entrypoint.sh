@@ -120,7 +120,7 @@ CONTENT_STORE=${CONTENT_STORE:-\$\{dir.root\}}
 
 REVERSE_PROXY_URL=${REVERSE_PROXY_URL:-}
 
-
+OOO_ENABLED=${OOO_ENABLED:-true}
 
 function cfg_replace_option {
   grep "$1" "$3" > /dev/null
