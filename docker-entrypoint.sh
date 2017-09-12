@@ -13,23 +13,10 @@ SHARE_HOSTNAME=${SHARE_HOSTNAME:-127.0.0.1}
 SHARE_PROTOCOL=${SHARE_PROTOCOL:-http}
 SHARE_PORT=${SHARE_PORT:-8080}
 
-DB_KIND=${DB_KIND:-postgresql}
-DB_DRIVER=${DB_DRIVER:-org.postgresql.Driver}
-DB_PORT=${DB_PORT:-5432}
-DB_USERNAME=${DB_USERNAME:-alfresco}
-DB_PASSWORD=${DB_PASSWORD:-admin}   
-DB_NAME=${DB_NAME:-alfresco}
-DB_HOST=${DB_HOST:-localhost}
-
-if [ "$DB_KIND" == "mysql" ]; then
-    DB_DRIVER='org.gjt.mm.mysql.Driver'
-    DB_PORT=DB_PORT='3306'
-    DB_CONN_PARAMS=${DB_CONN_PARAMS:-'?useSSL=false'}
-fi
-
 # if we're linked to MySQL and thus have credentials already, let's use them
 if [[ -v MYSQL_ENV_GOSU_VERSION ]]; then
     DB_KIND='mysql'
+    DB_HOST='mysql'
     DB_USERNAME=${MYSQL_ENV_MYSQL_USER:-root}
     if [ "$DB_USERNAME" = 'root' ]; then
         DB_PASSWORD=${MYSQL_ENV_MYSQL_ROOT_PASSWORD}
@@ -55,6 +42,7 @@ fi
 # if we're linked to PostgreSQL and thus have credentials already, let's use them
 if [[ -v POSTGRES_ENV_GOSU_VERSION ]]; then
     DB_KIND='postgresql'
+    DB_HOST='postgres'
     DB_USERNAME=${POSTGRES_ENV_POSTGRES_USER:-root}
     if [ "$DB_USERNAME" = 'postgres' ]; then
         DB_PASSWORD='postgres'
@@ -74,6 +62,20 @@ if [[ -v POSTGRES_ENV_GOSU_VERSION ]]; then
         echo >&2 '  (Also of interest might be DB_USERNAME and DB_NAME.)'
         exit 1
     fi
+fi
+
+DB_KIND=${DB_KIND:-postgresql}
+DB_DRIVER=${DB_DRIVER:-org.postgresql.Driver}
+DB_PORT=${DB_PORT:-5432}
+DB_USERNAME=${DB_USERNAME:-alfresco}
+DB_PASSWORD=${DB_PASSWORD:-admin}   
+DB_NAME=${DB_NAME:-alfresco}
+DB_HOST=${DB_HOST:-localhost}
+
+if [ "$DB_KIND" == "mysql" ]; then
+    DB_DRIVER='org.gjt.mm.mysql.Driver'
+    DB_PORT=DB_PORT='3306'
+    DB_CONN_PARAMS=${DB_CONN_PARAMS:-'?useSSL=false'}
 fi
 
 SYSTEM_SERVERMODE=${SYSTEM_SERVERMODE:-PRODUCTION}
