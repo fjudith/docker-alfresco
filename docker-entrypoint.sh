@@ -74,7 +74,7 @@ DB_HOST=${DB_HOST:-localhost}
 
 if [ "$DB_KIND" == "mysql" ]; then
     DB_DRIVER='org.gjt.mm.mysql.Driver'
-    DB_PORT=DB_PORT='3306'
+    DB_PORT=${DB_PORT:-'3306'}
     DB_CONN_PARAMS=${DB_CONN_PARAMS:-'?useSSL=false'}
 fi
 
@@ -157,7 +157,7 @@ function tweak_alfresco {
   cfg_replace_option db.username $DB_USERNAME $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option db.password $DB_PASSWORD $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option db.name $DB_NAME $ALFRESCO_GLOBAL_PROPERTIES
-  cfg_replace_option db.url jdbc:${DB_KIND,,}://${DB_HOST}:${DB_PORT}/${DB_NAME}${DB_CONN_PARAMS} $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option db.url "jdbc:${DB_KIND,,}://${DB_HOST}:${DB_PORT}/${DB_NAME}${DB_CONN_PARAMS}" $ALFRESCO_GLOBAL_PROPERTIES
 
   cfg_replace_option ftp.port $FTP_PORT $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option ooo.enabled $OOO_ENABLED $ALFRESCO_GLOBAL_PROPERTIES
