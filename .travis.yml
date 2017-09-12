@@ -13,4 +13,8 @@ before_install:
 script:
 - sleep 300
 - docker logs alfresco
+- docker exec alfresco /bin/bash -c "cat /alfresco/alfresco.log"
 - docker exec alfresco /bin/bash -c "curl -u admin:admin http://localhost:8080/alfresco/service/api/audit/control"
+
+after_success:
+- 
