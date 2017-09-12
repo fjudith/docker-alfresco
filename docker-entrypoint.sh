@@ -22,26 +22,26 @@ DB_NAME=${DB_NAME:-alfresco}
 DB_HOST=${DB_HOST:-localhost}
 
 if [ "$DB_KIND" == "mysql" ]; then
-    DB_DRIVER=org.gjt.mm.mysql.Driver
-    DB_PORT=${DB_PORT:-3306}
-    DB_CONN_PARAMS=${DB_CONN_PARAMS:-?useSSL=false}
+    DB_DRIVER='org.gjt.mm.mysql.Driver'
+    DB_PORT=DB_PORT='3306'
+    DB_CONN_PARAMS=${DB_CONN_PARAMS:-'?useSSL=false'}
 fi
 
 # if we're linked to MySQL and thus have credentials already, let's use them
 if [[ -v MYSQL_ENV_GOSU_VERSION ]]; then
-    : ${DB_KIND='mysql'}
-    : ${DB_USERNAME:=${MYSQL_ENV_MYSQL_USER:-root}}
+    DB_KIND='mysql'
+    DB_USERNAME=${MYSQL_ENV_MYSQL_USER:-root}
     if [ "$DB_USERNAME" = 'root' ]; then
-        : ${DB_PASSWORD:=$MYSQL_ENV_MYSQL_ROOT_PASSWORD}
+        DB_PASSWORD:=${MYSQL_ENV_MYSQL_ROOT_PASSWORD}
     fi
-    : ${DB_PASSWORD:=$MYSQL_ENV_MYSQL_PASSWORD}
-    : ${DB_NAME:=${MYSQL_ENV_MYSQL_DATABASE:-alfresco}}
-    : ${DB_URL="jdbc:mysql://mysql:3306/$DB_NAME"}
+    DB_PASSWORD=${MYSQL_ENV_MYSQL_PASSWORD}
+    DB_NAME=${MYSQL_ENV_MYSQL_DATABASE:-alfresco}
+    DB_URL="jdbc:mysql://mysql:3306/$DB_NAME"
 
     echo 'Using MysQL'
-    DB_DRIVER=org.gjt.mm.mysql.Driver
-    DB_PORT=${DB_PORT:-3306}
-    DB_CONN_PARAMS=${DB_CONN_PARAMS:-?useSSL=false}
+    DB_DRIVER='org.gjt.mm.mysql.Driver'
+    DB_PORT='3306'
+    DB_CONN_PARAMS=${DB_CONN_PARAMS:-'?useSSL=false'}
 
     if [ -z "$DB_PASSWORD" ]; then
         echo >&2 'error: missing required DB_PASSWORD environment variable'
@@ -54,18 +54,18 @@ fi
 
 # if we're linked to PostgreSQL and thus have credentials already, let's use them
 if [[ -v POSTGRES_ENV_GOSU_VERSION ]]; then
-    : ${DB_KIND='postgresql'}
-    : ${DB_USERNAME:=${POSTGRES_ENV_POSTGRES_USER:-root}}
+    DB_KIND='postgresql'
+    DB_USERNAME=${POSTGRES_ENV_POSTGRES_USER:-root}
     if [ "$DB_USERNAME" = 'postgres' ]; then
-        : ${DB_PASSWORD:='postgres' }
+        DB_PASSWORD='postgres'
     fi
-    : ${DB_PASSWORD:=$POSTGRES_ENV_POSTGRES_PASSWORD}
-    : ${DB_NAME:=${POSTGRES_ENV_POSTGRES_DB:-alfresco}}
-    : ${DB_URL="jdbc:postgresql://postgres:5432/$DB_NAME"}
+    DB_PASSWORD=${POSTGRES_ENV_POSTGRES_PASSWORD}
+    DB_NAME=${POSTGRES_ENV_POSTGRES_DB:-alfresco}
+    DB_URL="jdbc:postgresql://postgres:5432/$DB_NAME"
 
     echo 'Using PostgreSQL'
-    DB_DRIVER=org.postgresql.Driver
-    DB_PORT=${DB_PORT:-5432}
+    DB_DRIVER='org.postgresql.Driver'
+    DB_PORT='5432'
 
     if [ -z "$DB_PASSWORD" ]; then
         echo >&2 'error: missing required DB_PASSWORD environment variable'
