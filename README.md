@@ -1,4 +1,5 @@
 [![](https://images.microbadger.com/badges/image/fjudith/alfresco.svg)](https://microbadger.com/images/fjudith/alfresco "Get your own image badge on microbadger.com")
+[![Build Status](https://travis-ci.org/fjudith/docker-alfresco.svg?branch=master)](https://travis-ci.org/fjudith/docker-alfresco)
 
 # Supported tags and respective Dockerfile links
 
