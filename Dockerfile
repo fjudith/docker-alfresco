@@ -78,5 +78,5 @@ VOLUME /alfresco/tomcat/logs
 
 EXPOSE 21 137 138 139 445 8009 8080
 
-ENTRYPOINT ["/docker-entrypoint.sh"]
+ENTRYPOINT ["/alfresco/docker-entrypoint.sh"]
 CMD ["/usr/bin/supervisord","-c","/etc/supervisord.conf","-n"]
