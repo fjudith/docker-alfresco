@@ -11,4 +11,4 @@ before_install:
 
 
 script:
-- sleep 300 && docker run busybox --link alfreso:alfresco busybox /bin/bash -c "curl http://alfresco:8080/alfresco"
+- sleep 300 && docker exec alfresco /bin/bash -c "curl -o https://localhost:8080/alfresco"
