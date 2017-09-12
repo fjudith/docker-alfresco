@@ -1,0 +1,14 @@
+
+sudo: required
+services:
+- docker
+
+before_install:
+- docker build -t fjudith/alfresco .
+- docker run --name 'mysql' -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=secret -e MYSQL_DATABASE=alfresco -e MYSQL_USER=alfresco -e MYSQL_PASSWORD=secret mysql --character-set-server=utf8 --collation-server=utf8_general_ci --max_connections=1024
+- docker run --name 'alfresco' -d -p 8080:8080 --link mysql:mysql fjudith/alfresco
+- docker ps -a
+
+
+script:
+- sleep 300 && docker run busybox --link alfreso:alfresco busybox /bin/bash -c "curl http://alfresco:8080/alfresco"
