@@ -292,4 +292,4 @@ if [ "${DB_KIND,,}" == "postgresql" ] && [ "$DB_HOST" == "localhost" ]; then
 fi
 
 # start Tomcat
-$ALF_HOME/tomcat/scripts/ctl.sh start
+exec "$@"

@@ -1,20 +1,36 @@
+env:
+  global:
+  - REPO=fjudith/alfresco
+  - COMMIT=${TRAVIS_COMMIT::8}
+  - secure: "tcOxBQmzMIZJ88rOpIkf1B8x2mNszUUq3I4ebeubx1iRgVjktpbVxf9hT0DKeF/bfEmC9BOxTLHEGdjrnzZ1pVV+EAkBgX12coMHxC2FGbCR5cyrdoSVHVUrg1KAyra92bWVgD0AqWpXIncgfwi4kgatScO8066YdUShna/PPi59YMhxhhQfg8ij6Qch/srf2m03i8Sxpk/MZhNMwMFBkS1CBq4KYGUR8yMFE7iCTo5c6e/4a4DGLxSP4G6+M4WTLf2ayMbl4/QNCQ2h2NWgkrqxmeMfadYGEhLsIQgqozdHl2N5JrPeFyYsJ0L4O9s8Qlt01EX+WYEylVfHhbU4ReoPhILd0ptAiYIFib+5KdNvAsr2z7xWybsgVrc3AomXRUoxT59AtpNJKOSIWRWeRW+aLRpkY3vsXDHkE2GQCrNV3K4CZU5Jd7uFue7q6Fu7BmQdBKhOf35R+Ktqj3ouuLjIbYG1bg0iKczhyxJmbw84jR5yrDoIEXTgSEogxx2YVmlGWhvSDziv6EM0PfCyS4IOxRQ4sBMLvgIxOm+agAsvU3s1O4Bw2UtdYo/i7bV7/DrwLo51uDQVkgllPZAxBJgiv+yfdc35yb6duo99pgM5BAISCIYv+4IcDBsIKnqNOAMhCwAd8hIgbGgN12JC2LCY1RXpph0OyFaKe5LH69Q="
+  - secure: "dbpst2raRxWU6yP4OH7e7wyEt7uC9zQhHrmgYY9QSqur4fCpQPiRIe2Zz/49cMRDsMgTSK2DG7tqE7PgA8uVMITR7nVZP/mKgpY6TvVCYo9BO6VxqK/9JtDhkm5z4I/ADHx14RKZvGrjB4E7+pafqlejkVpJpbROdDwfZzpTObN3svGJmUPWr5BQxgaRGINzGY2qTGcdFTlrLB2f0qLnzq1X04waYOHg863kO02730GLbDFPB+BWxOdOzrKEX0Y/+It3YWJA6Li6xbV+RIqO0+LbmJAO6PvSPPphXiWH4+6zOSAMzy9dZpjOhCHl+3w4L/obUidTlE/7zERaD6DqJp+9YDb/WpC2a8gmi4TKETMRIjZKe9YhI4/HfKX9tamQV0F/XokPn+J8lvt+eZeRPh9f2aeDXME9TrmkXh8hjsGHlQKNMuyF2f3nMvL/ZUFuzgH30c1/o//pzM6u5G92bvcYndowxkr4ZYjKkFeEF+m51AyPlDp6qRMYwPJRSE0XEd04hYW/9eBVE8igYc0YyVT9ogsiNhb9DrrDld5bItkpgj0P06heQA2LeBh2iEQNlivVJVfcsrWJtquDm/fen0DORQJY6g224uwVx95D+TQaYuRD2E2st/eDjCM4ySHZbcPVOOPhUPi9ckoTVYHkrRx18omxmagKV5gvCH0Qiic="
+  - secure: "3eTbskbVurvC7shmelxeFwB9US2HsinbmMHh2/dakiauH4rEwBPcZT57X3s6zV2uNzxavHvz6dY5uiNx5BBEPqiSpHglkGUFvg64qorMBmcuBiqwDEUjUL1ogQqM3DF7Gg2xhviySNUr7vJ/X7/DROYfrRI9sW5b4tHMwxRZUiyXjdjVYDxOoPiZehmIfMy6ErioAJR2Cwp22Ws26Rb7gIAzPqo2xkamE+qnrsLkxyfSUXeUsgIy2UZ97uZghOHWLSah7Gd0h42lyu8hhN6iAPPbHdgPFZrrao7Xkmxu0uscTFWBJBjGZayrshKYBW+em5UuEuU1d1x2Ox3Dw4GDVVe1oZeRRLUXFSOYuk0QI4AowQiBoYlbU0zsu+e88dwOcnC6Tn500J4Ah5OeLOrRpJ+JxUrnWZQLuTA4jRvctYAvM9vufZ5nWoKHSGTCrH8iP1vBVS2QmQxMVGTCXye049TkMvkZZDVYRYfPqwKuQhkODHtXVgRJYOO2qQ8HDT3T4tepmBOONgR/tjXy1Tzsj/JI7uP7qbPOjJdvK8pmj+0NCFyPhQiJA6CmrCbhtQgp+PzGMoSuYwla1zpqm4adqTa4sf3tJR3OX7zeJatfmYu618KN6OrgrpCwwj2WoUAXLWF0t13lcUz3q0royxzPvK9P6q77wVujwJQkXiGFj6o="
+
 
 sudo: required
 services:
-- docker
+  - docker
+
 
 before_install:
-- docker build -t fjudith/alfresco .
-- docker run --name 'mysql' -d -p 32731:3306 -e MYSQL_ROOT_PASSWORD=secret -e MYSQL_DATABASE=alfresco -e MYSQL_USER=alfresco -e MYSQL_PASSWORD=secret mysql --character-set-server=utf8 --collation-server=utf8_general_ci --max_connections=1024
-- docker run --name 'alfresco' -d -p 32732:8080 --link mysql:mysql fjudith/alfresco
-- docker ps -a
+  - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
+  - docker build -t $REPO:$TAG .
+  - docker run --name 'mysql' -d -p 32731:3306 -e MYSQL_ROOT_PASSWORD=secret -e MYSQL_DATABASE=alfresco -e MYSQL_USER=alfresco -e MYSQL_PASSWORD=secret mysql --character-set-server=utf8 --collation-server=utf8_general_ci --max_connections=1024
+  - docker run --name 'alfresco' -d -p 32732:8080 --link mysql:mysql $REPO:$TAG
+  - docker ps -a
 
 
 script:
-- sleep 300
-- docker logs alfresco
-- docker exec alfresco /bin/bash -c "cat /alfresco/alfresco.log"
-- docker exec alfresco /bin/bash -c "curl -u admin:admin http://localhost:8080/alfresco/service/api/audit/control"
+  - sleep 300
+  - docker logs alfresco
+  - docker exec alfresco /bin/bash -c "cat /alfresco/alfresco.log"
+  - docker exec alfresco /bin/bash -c "curl -u admin:admin http://localhost:8080/alfresco/service/api/audit/control"
+
 
 after_success:
-- 
+  - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+  - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
+  - docker build -f Dockerfile -t $REPO:$COMMIT .
+  - docker tag $REPO:$COMMIT $REPO:$TAG
+  - docker tag $REPO:$COMMIT $REPO:travis-$TRAVIS_BUILD_NUMBER
+  - docker push $REPO
