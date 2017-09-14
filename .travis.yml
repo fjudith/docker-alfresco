@@ -17,9 +17,9 @@ services:
 
 
 before_install:
-  - docker build -f Dockerfile -t $REPO:$TAG .
+  - docker build -f Dockerfile -t $REPO:$COMMIT .
   - docker run --name 'mysql' -d -p 32731:3306 -e MYSQL_ROOT_PASSWORD=secret -e MYSQL_DATABASE=alfresco -e MYSQL_USER=alfresco -e MYSQL_PASSWORD=secret mysql --character-set-server=utf8 --collation-server=utf8_general_ci --max_connections=1024
-  - docker run --name 'alfresco' -d -p 32732:8080 --link mysql:mysql $REPO:$TAG
+  - docker run --name 'alfresco' -d -p 32732:8080 --link mysql:mysql $REPO:$COMMIT
   - docker ps -a
 
 
