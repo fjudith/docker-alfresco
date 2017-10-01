@@ -28,7 +28,7 @@ pipeline {
         }
         stage ('Docker build'){
             parallel {
-                stage ('Nexus Application server') {
+                stage ('Alfresco Application server') {
                     agent { label 'docker'}
                     steps {
                         //sh 'rm -rf *'
