@@ -6,6 +6,7 @@ pipeline {
     environment {
         REPO = 'fjudith/alfresco'
         PRIVATE_REPO = "${PRIVATE_REGISTRY}/${REPO}"
+        DOCKER_PRIVATE = credentials('docker-private-registry')
     }
     stages {
         stage ('Checkout') {
@@ -20,10 +21,7 @@ pipeline {
                         NGINX = "${BRANCH_NAME}-nginx"
                     }
                 }
-                //checkout scm
-
-                //stash name: 'everything',
-                //    includes: '**'
+                sh 'printenv'
             }
         }
         stage ('Docker build'){
@@ -31,11 +29,11 @@ pipeline {
                 stage ('Alfresco Application server') {
                     agent { label 'docker'}
                     steps {
-                        //sh 'rm -rf *'
-                        //unstash 'everything'
                         sh 'tree -sh'
                         sh "docker build -f Dockerfile -t ${REPO}:${GIT_COMMIT} ."
                         sh "docker tag ${REPO}:${GIT_COMMIT} ${REPO}:${BRANCH_NAME}"
+                        sh "docker login -u ${DOCKER_PRIVATE_USR} -p ${DOCKER_PRIVATE_PSW} ${PRIVATE_REGISTRY}"
+                        sh "docker push ${PRIVATE_REPO}"
                     }
                 }
             }
