@@ -14,11 +14,9 @@ pipeline {
                 script {
                     if ("${BRANCH_NAME}" == "master"){
                         TAG = "latest"
-                        NGINX = "nginx"
                     }
                     else {
                         TAG = "${BRANCH_NAME}"
-                        NGINX = "${BRANCH_NAME}-nginx"
                     }
                 }
                 sh 'printenv'
@@ -26,15 +24,28 @@ pipeline {
         }
         stage ('Docker build'){
             parallel {
-                stage ('Alfresco Application server') {
+                stage ('Alfresco Web & Application server') {
                     agent { label 'docker'}
                     steps {
                         sh 'tree -sh'
                         sh "docker build -f Dockerfile -t ${REPO}:${GIT_COMMIT} ."
-                        sh "docker tag ${REPO}:${GIT_COMMIT} ${REPO}:${TAG}"
-                        sh "docker tag ${REPO}:${GIT_COMMIT} ${PRIVATE_REPO}:${TAG}"
-                        sh "docker login -u ${DOCKER_PRIVATE_USR} -p ${DOCKER_PRIVATE_PSW} ${PRIVATE_REGISTRY}"
-                        sh "docker push ${PRIVATE_REPO}"
+                        sh "docker run -d --name 'alfresco-${BUILD_NUMBER}' -p 55080:8080 -p 55443:8443 ${REPO}:${GIT_COMMIT}"
+                        sh "docker ps -a"
+                        sleep 10
+                        sh "docker logs alfresco-${BUILD_NUMBER}"
+                        sh 'docker run --rm --link alfresco-${BUILD_NUMBER}:drawio blitznote/debootstrap-amd64:17.04 bash -c "curl -i -X GET -u admin:admin http://localhost:8080/alfresco/service/api/audit/control"'
+                    }
+                    post {
+                        always {
+                           sh 'docker rm -f alfresco-${BUILD_NUMBER}'
+                        }
+                        success {
+                            echo 'Tag and Push to private registry'
+                            sh "docker tag ${REPO}:${GIT_COMMIT} ${REPO}:${TAG}"
+                            sh "docker tag ${REPO}:${GIT_COMMIT} ${PRIVATE_REPO}:${TAG}"
+                            sh "docker login -u ${DOCKER_PRIVATE_USR} -p ${DOCKER_PRIVATE_PSW} ${PRIVATE_REGISTRY}"
+                            sh "docker push ${PRIVATE_REPO}"
+                        }
                     }
                 }
             }
