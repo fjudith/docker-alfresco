@@ -31,7 +31,7 @@ pipeline {
                         sh "docker build -f Dockerfile -t ${REPO}:${GIT_COMMIT} ."
                         sh "docker run -d --name 'alfresco-${BUILD_NUMBER}' -p 55080:8080 -p 55443:8443 ${REPO}:${GIT_COMMIT}"
                         sh "docker ps -a"
-                        sleep 10
+                        sleep 300
                         sh "docker logs alfresco-${BUILD_NUMBER}"
                         sh 'docker run --rm --link alfresco-${BUILD_NUMBER}:drawio blitznote/debootstrap-amd64:17.04 bash -c "curl -i -X GET -u admin:admin http://localhost:8080/alfresco/service/api/audit/control"'
                     }
