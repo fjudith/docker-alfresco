@@ -23,8 +23,8 @@ pipeline {
             }
         }
         stage ('Build Alfresco add-ons'){
-            stage ("Build Manual Manager add-on"){
-                parallel {
+            parallel {
+                stage ("Build Manual Manager add-on"){
                     agent { label 'maven' }
                     steps {
                         git url: 'git://github.com/loftuxab/manual-manager.git',
