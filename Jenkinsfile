@@ -22,16 +22,20 @@ pipeline {
                 sh 'printenv'
             }
         }
-        stage ("Build Manual Manager add-on"){
-            agent { label 'maven' }
-            steps {
-                git url: 'git://github.com/loftuxab/manual-manager.git',
-                    branch: 'master'
-                sh 'tree -sh'
-                sh 'ant package'
-                stash name: 'manual-manager',
-                    excludes: '**',
-                    includes: 'build/**'
+        stage ('Build Alfresco add-ons'){
+            stage ("Build Manual Manager add-on"){
+                parallel {
+                    agent { label 'maven' }
+                    steps {
+                        git url: 'git://github.com/loftuxab/manual-manager.git',
+                            branch: 'master'
+                        sh 'tree -sh'
+                        sh 'ant package'
+                        stash name: 'manual-manager',
+                            excludes: '**',
+                            includes: 'build/**'
+                    }
+                }
             }
         }
         stage ('Docker build'){
