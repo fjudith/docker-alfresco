@@ -33,7 +33,7 @@ pipeline {
                         sh "docker ps -a"
                         sleep 300
                         sh "docker logs alfresco-${BUILD_NUMBER}"
-                        sh 'docker run --rm --link alfresco-${BUILD_NUMBER}:drawio blitznote/debootstrap-amd64:17.04 bash -c "curl -i -X GET -u admin:admin http://localhost:8080/alfresco/service/api/audit/control"'
+                        sh 'docker run --rm --link alfresco-${BUILD_NUMBER}:alfresco blitznote/debootstrap-amd64:17.04 bash -c "curl -i -X GET -u admin:admin http://alfresco:8080/alfresco/service/api/audit/control"'
                     }
                     post {
                         always {
