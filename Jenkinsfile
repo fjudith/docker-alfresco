@@ -32,7 +32,6 @@ pipeline {
                         sh 'tree -sh'
                         sh 'ant package'
                         stash name: 'manual-manager',
-                            excludes: '**',
                             includes: 'build/**'
                     }
                 }
