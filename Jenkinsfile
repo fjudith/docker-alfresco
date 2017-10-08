@@ -28,7 +28,7 @@ pipeline {
                 git url: 'git://github.com/loftuxab/manual-manager.git',
                     branch: 'master'
                 sh 'tree -sh'
-                sh 'cd manual-manager && ant package'
+                sh 'ant package'
                 stash name: 'manual-manager',
                     excludes: '**',
                     includes: 'build'
