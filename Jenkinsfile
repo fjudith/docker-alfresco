@@ -42,6 +42,7 @@ pipeline {
                 stage ('Alfresco Web & Application server') {
                     agent { label 'docker'}
                     steps {
+                        unstash  'manual-manager'
                         sh 'tree -sh'
                         sh "docker build -f Dockerfile -t ${REPO}:${GIT_COMMIT} ."
                         sh "docker run -d --name 'alfresco-${BUILD_NUMBER}' -p 55080:8080 -p 55443:8443 ${REPO}:${GIT_COMMIT}"
