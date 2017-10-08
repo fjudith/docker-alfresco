@@ -32,7 +32,7 @@ pipeline {
                         sh 'tree -sh'
                         sh 'ant package'
                         stash name: 'manual-manager',
-                            includes: 'build/**'
+                            includes: 'build/dist/**'
                     }
                 }
                 stage ("Build Markdown Preview addon"){
@@ -49,7 +49,7 @@ pipeline {
                         sh 'pushd share && gradle amp && popd'
                         sh 'pushd repo && gradle repo && popd'
                         stash name: 'md-preview',
-                            includes: 'repo/build/**,share/build/**'
+                            includes: 'repo/build/amp/**,share/build/amp/**'
                     }
                 }
             }
