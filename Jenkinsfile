@@ -35,16 +35,16 @@ pipeline {
                             includes: 'build/dist/**'
                     }
                 }
-                stage ("Build Markdown Preview addon"){
+                stage ("Build Markdown Preview add-on"){
                     agent { label 'maven' }
                     steps {
-                        
+                        // https://bitbucket.org/parashift/alfresco-amp-plugin
                         git url: 'git://github.com/yeyan/alfresco-amp-plugin.git',
-                            branch 'master'
+                            branch: 'master'
                         sh 'tree -sh'
                         sh 'gradle publish'
                         git url: 'git://github.com/fjudith/md-preview.git',
-                            branch 'master'
+                            branch: 'master'
                         sh 'tree -sh'
                         sh 'pushd share && gradle amp && popd'
                         sh 'pushd repo && gradle repo && popd'
