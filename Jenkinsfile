@@ -38,7 +38,7 @@ pipeline {
                 stage ("Build Markdown Preview addon"){
                     agent { label 'maven' }
                     steps {
-                        // https://bitbucket.org/parashift/alfresco-amp-plugin
+                        
                         git url: 'git://github.com/yeyan/alfresco-amp-plugin.git',
                             branch 'master'
                         sh 'tree -sh'
