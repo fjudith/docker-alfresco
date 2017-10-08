@@ -31,7 +31,7 @@ pipeline {
                 sh 'ant package'
                 stash name: 'manual-manager',
                     excludes: '**',
-                    includes: 'build'
+                    includes: 'build/**'
             }
         }
         stage ('Docker build'){
