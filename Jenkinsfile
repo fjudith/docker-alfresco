@@ -47,7 +47,7 @@ pipeline {
                             branch: 'master'
                         sh 'tree -sh'
                         sh 'cd share/ && gradle amp && cd ../'
-                        sh 'cd repo/ && gradle repo && cd ../'
+                        sh 'cd repo/ && gradle amp && cd ../'
                         stash name: 'md-preview',
                             includes: 'repo/build/amp/**,share/build/amp/**'
                     }
