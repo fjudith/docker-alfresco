@@ -46,8 +46,8 @@ pipeline {
                         git url: 'git://github.com/fjudith/md-preview.git',
                             branch: 'master'
                         sh 'tree -sh'
-                        sh 'pushd share && gradle amp && popd'
-                        sh 'pushd repo && gradle repo && popd'
+                        sh 'cd share/ && gradle amp && cd ../'
+                        sh 'cd repo/ && gradle repo && cd ../'
                         stash name: 'md-preview',
                             includes: 'repo/build/amp/**,share/build/amp/**'
                     }
