@@ -35,6 +35,23 @@ pipeline {
                             includes: 'build/**'
                     }
                 }
+                stage ("Build Markdown Preview addon"){
+                    agent { label 'maven' }
+                    steps {
+                        // https://bitbucket.org/parashift/alfresco-amp-plugin
+                        git url: 'git://github.com/yeyan/alfresco-amp-plugin.git',
+                            branch 'master'
+                        sh 'tree -sh'
+                        sh 'gradle publish'
+                        git url: 'git://github.com/fjudith/md-preview.git',
+                            branch 'master'
+                        sh 'tree -sh'
+                        sh 'pushd share && gradle amp && popd'
+                        sh 'pushd repo && gradle repo && popd'
+                        stash name: 'md-preview',
+                            includes: 'repo/build/**,share/build/**'
+                    }
+                }
             }
         }
         stage ('Docker build'){
@@ -42,7 +59,8 @@ pipeline {
                 stage ('Alfresco Web & Application server') {
                     agent { label 'docker'}
                     steps {
-                        unstash  'manual-manager'
+                        unstash 'manual-manager'
+                        unstash 'md-preview'
                         sh 'tree -sh'
                         sh "docker build -f Dockerfile -t ${REPO}:${GIT_COMMIT} ."
                         sh "docker run -d --name 'alfresco-${BUILD_NUMBER}' -p 55080:8080 -p 55443:8443 ${REPO}:${GIT_COMMIT}"
