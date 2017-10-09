@@ -44,7 +44,7 @@ pipeline {
                         sh 'tree -sh'
                         sh 'gradle publish'
                         git url: 'git://github.com/fjudith/md-preview.git',
-                            branch: 'master'
+                            branch: '1.7.2'
                         sh 'tree -sh'
                         sh 'cd share/ && gradle amp && cd ../'
                         sh 'cd repo/ && gradle amp && cd ../'
