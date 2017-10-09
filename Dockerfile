@@ -67,8 +67,10 @@ COPY assets/ldap-ad-authentication.properties /alfresco/tomcat/shared/classes/al
 # Copy ManualManager Add-On
 # Markdown manual editor and viewer
 # https://github.com/loftuxab/manual-manager
-COPY add-ons/install_manualmanager.sh /tmp/
-RUN chmod +x /tmp/install_manualmanager.sh
+ADD build/dist/*.jar $ALF_HOME/tomcat/webapps/alfresco/WEB-INF/lib/
+ADD build/dist/*.jar $ALF_HOME/tomcat/webapps/alfresco/WEB-INF/lib/
+# COPY add-ons/install_manualmanager.sh /tmp/
+# RUN chmod +x /tmp/install_manualmanager.sh
 
 # Copy BeCPG Add-On.
 # http://www.becpg.fr/
@@ -77,8 +79,10 @@ RUN chmod +x /tmp/install_becpg.sh
 
 # Copy Markdown Preview Add-On.
 # https://github.com/cetra3/md-preview
-COPY add-ons/install_md-preview.sh /tmp/
-RUN chmod +x /tmp/install_md-preview.sh
+ADD share/build/amp/*.amp /alfresco/amps_share/
+ADD repo/build/amp/*.amp /alfresco/amps/
+# COPY add-ons/install_md-preview.sh /tmp/
+# RUN chmod +x /tmp/install_md-preview.sh
 
 # install scripts
 COPY docker-entrypoint.sh /alfresco/
