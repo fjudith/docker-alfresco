@@ -83,7 +83,7 @@ RUN chmod +x /tmp/install_md-preview.sh
 # install scripts
 COPY docker-entrypoint.sh /alfresco/
 RUN chmod +x /alfresco/docker-entrypoint.sh 
-COPY assts/supervisord.conf /etc/
+COPY assets/supervisord.conf /etc/
 
 RUN mkdir -p /alfresco/tomcat/webapps/ROOT
 COPY assets/index.jsp /alfresco/tomcat/webapps/ROOT/
