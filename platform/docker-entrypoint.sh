@@ -3,6 +3,7 @@ CATALINA_HOME=/usr/local/tomcat
 ALF_HOME=${CATALINA_HOME}/webapps/alfresco
 ALF_BIN=${ALF_HOME}/bin
 ALF_SETUP=${ALF_HOME}/setup
+DIR_ROOT=${DIR_ROOT:-'/var/lib/alf_data'}
 
 ALFRESCO_HOSTNAME=${ALFRESCO_HOSTNAME:-127.0.0.1}
 ALFRESCO_PROTOCOL=${ALFRESCO_PROTOCOL:-http}
@@ -222,7 +223,7 @@ function tweak_alfresco {
   fi
 
   # content store
-  cfg_replate_option dir.root "/var/lib/alf_data"
+  cfg_replace_option dir.root "${DIR_ROOT}" $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option dir.contentstore "${CONTENT_STORE}/contentstore" $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option dir.contentstore.deleted "${CONTENT_STORE}/contentstore.deleted" $ALFRESCO_GLOBAL_PROPERTIES
 }
