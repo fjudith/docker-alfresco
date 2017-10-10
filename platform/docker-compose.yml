@@ -1,8 +1,16 @@
 version: '2'
 services:
+  postgresql:
+    environment:
+      POSTGRES_DB: alfresco
+      POSTGRES_PASSWORD: alfresco
+      POSTGRES_USER: alfresco
+    image: postgres:9.4
+    volumes:
+      - /var/lib/postgresql/data
   alfresco:
     environment:
-      DB_HOST: postgresql
+      DB_HOST: postgres
       DB_KIND: postgresql
       DB_NAME: alfresco
       DB_PASSWORD: alfresco
@@ -18,7 +26,7 @@ services:
     build: .
     image: fjudith/alfresco:platform
     links:
-      - postgresql:postgresql
+      - postgresql:postgres
     ports:
       - "21:21"
       - "137:137"
@@ -31,11 +39,3 @@ services:
     volumes:
       - /alfresco/alf_data
       - /alfresco/tomcat/logs
-  postgresql:
-    environment:
-      POSTGRES_DB: alfresco
-      POSTGRES_PASSWORD: alfresco
-      POSTGRES_USER: alfresco
-    image: postgres:9.4
-    volumes:
-      - /var/lib/postgresql/data

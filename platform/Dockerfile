@@ -53,7 +53,7 @@ RUN set -x && \
 # Add PostgreSQL driver to Tomcat
 WORKDIR /usr/local/tomcat/lib
 ADD ${REPO}/postgresql/postgresql/${POSTGRES_CONNECTOR_VERSION}/postgresql-${POSTGRES_CONNECTOR_VERSION}.jar \
-    lib/postgresql-${POSTGRES_CONNECTOR_VERSION}.jar
+    postgresql-${POSTGRES_CONNECTOR_VERSION}.jar
 
 
 # Add MySQL driver to Tomcat
