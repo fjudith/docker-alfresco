@@ -16,9 +16,10 @@ ENV LIBREOFFICE_PATH="/opt/libreoffice${LIBREOFFICE_VERSION}"
 # Create user
 RUN useradd -ms /bin/bash libreoffice
 
+
 # Install dependencies
-RUN apt-get update -yq && \
-    apt-get install -yq --no-install-recommends \
+RUN apt-get update -yqq && \
+    apt-get install -yqq --no-install-recommends \
         curl \
         fontconfig \
         libsm6 \

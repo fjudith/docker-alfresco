@@ -131,10 +131,10 @@ OOO_PORT=${OOO_PORT:-'8100'}
 
 SOLR_INDEX_SUBSYSTEM=${SOLR_INDEX_SUBSYSTEM:-'solr6'}
 SOLR_HOST=${SOLR_HOST:-'solr'}
-SOLR_PORT=${SOLR_PORT:-'8080'}
+SOLR_PORT=${SOLR_PORT:-'8983'}
 SOLR_PORT_SSL=${SOLR_PORT_SSL:-'8443'}
-SOLR_MAX_TOTAL={$SOLR_MAX_TOTAL:-'40'}
-SOLR_MAX_HOSTS={$SOLR_MAX_HOSTS:-'40'}
+SOLR_MAX_TOTAL=${$SOLR_MAX_TOTAL:-'40'}
+SOLR_MAX_HOSTS=${$SOLR_MAX_HOSTS:-'40'}
 SOLR_SECURECOMMS=${SOLR_SECURECOMMS:-'none'}
 
 function cfg_replace_option {
@@ -244,6 +244,7 @@ function tweak_alfresco {
   fi
 
   # content store
+  if ! [ -d ${DIR_ROOT} ]; then mkdir -p ${DIR_ROOT}; fi
   cfg_replace_option dir.root "${DIR_ROOT}" $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option dir.contentstore "${CONTENT_STORE}/contentstore" $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option dir.contentstore.deleted "${CONTENT_STORE}/contentstore.deleted" $ALFRESCO_GLOBAL_PROPERTIES
@@ -276,20 +277,6 @@ function set_reverse_proxy {
     cfg_replace_option alfresco.protocol $ALFRESCO_PROTOCOL $ALFRESCO_GLOBAL_PROPERTIES
     cfg_replace_option share.host $SHARE_HOSTNAME $ALFRESCO_GLOBAL_PROPERTIES
     cfg_replace_option share.protocol $SHARE_PROTOCOL $ALFRESCO_GLOBAL_PROPERTIES
-
-    xmlstarlet ed  \
-    -P -S -L \
-    -i '/alfresco-config/config[@condition="CSRFPolicy" and not(@replace)]' \
-    -t 'attr' -n 'replace' -v 'true' \
-    -s '/alfresco-config/config[@condition="CSRFPolicy"]/filter/rule/action[@name="assertOrigin"]' \
-    -t 'elem' -n 'param' -v "$REVERSE_PROXY_URL" \
-    -i '/alfresco-config/config[@condition="CSRFPolicy"]/filter/rule/action[@name="assertOrigin"]/param[not(@name)]' \
-    -t 'attr' -n 'name' -v 'origin' \
-    -s '/alfresco-config/config[@condition="CSRFPolicy"]/filter/rule/action[@name="assertReferer"]' \
-    -t 'elem' -n 'param' -v "$REVERSE_PROXY_URL/.*" \
-    -i '/alfresco-config/config[@condition="CSRFPolicy"]/filter/rule/action[@name="assertReferer"]/param[not(@name)]' \
-    -t 'attr' -n 'name' -v 'referer' \
-    $CATALINA_HOME/shared/classes/alfresco/web-extension/share-config-custom.xml
   
   fi
 }

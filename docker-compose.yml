@@ -13,6 +13,11 @@ services:
     image: fjudith/alfresco:libreoffice
     ports:
       - "8100:8100"
+  search:
+    build: search/
+    image: fjudith/alfresco:search
+    ports:
+      - "8983:8983"
   platform:
     environment:
       DB_HOST: postgres
@@ -33,15 +38,21 @@ services:
     links:
       - postgresql:postgres
       - libreoffice:libreoffice
+      - search:solr
     ports:
       - "21:21"
       - "137:137"
       - "138:138"
       - "139:139"
       - "445:445"
-      - "7070:7070"
       - "8009:8009"
-      - "8080:8080"
     volumes:
       - /alfresco/alf_data
       - /alfresco/tomcat/logs
+  share:
+    build: share/
+    image: fjudith/alfresco:share
+    ports:
+      - "8080:8080"
+    links:
+      - platform:platform

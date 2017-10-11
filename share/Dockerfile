@@ -10,23 +10,17 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV JAVA_OPTS " -XX:-DisableExplicitGC -Djava.security.egd=file:/dev/./urandom -Djava.awt.headless=true -Dfile.encoding=UTF-8 "
 
 ENV REPO="https://artifacts.alfresco.com/nexus/content/groups/public"
-ENV MD_PREVIEW="https://github.com/fjudith/md-preview"
 ENV ALFRESCO_MMT_VERSION='5.2.g'
-ENV ALFRESCO_PLATFORM_VERSION='5.2.g'
-ENV ALFRESCO_SHARE_SERVICES_VERSION='5.2.f'
-ENV ALFRESCO_PDF_RENDERER_VERSION='1.0'
+ENV ALFRESCO_SHARE_VERSION='5.2.f'
 ENV REPO_SHARE_EXTRA="https://artifacts.alfresco.com/nexus/service/local/repositories/share-extras/content"
 ENV ALFRESCO_OAUTH_VERSION='2.3.0'
-ENV POSTGRES_CONNECTOR_VERSION='9.2-1002.jdbc4'
-ENV MYSQL_CONNECTOR_VERSION='5.1.38'
-ENV MD_PREVIEW_VERSION='1.3.0'
+
 
 RUN set -x && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
-        imagemagick \
-        ghostscript \
         xmlstarlet
+
 
 # Download Alfresco Module Management
 WORKDIR /root
@@ -37,66 +31,25 @@ RUN curl ${REPO}/org/alfresco/alfresco-mmt/${ALFRESCO_MMT_VERSION}/alfresco-mmt-
 
 # Deploy Alfresco Platform in Tomcat
 WORKDIR /usr/local/tomcat
-RUN curl ${REPO}/org/alfresco/alfresco-platform/${ALFRESCO_PLATFORM_VERSION}/alfresco-platform-${ALFRESCO_PLATFORM_VERSION}.war \
-    -o alfresco-platform-${ALFRESCO_PLATFORM_VERSION}.war && \
+RUN curl ${REPO}/org/alfresco/share/${ALFRESCO_SHARE_VERSION}/share-${ALFRESCO_SHARE_VERSION}.war \
+    -o share-${ALFRESCO_SHARE_VERSION}.war && \
     set -x && \
-    unzip -q alfresco-platform-${ALFRESCO_PLATFORM_VERSION}.war -d webapps/alfresco && \
-    rm alfresco-platform-${ALFRESCO_PLATFORM_VERSION}.war
+    unzip -q share-${ALFRESCO_SHARE_VERSION}.war -d webapps/share && \
+    rm share-${ALFRESCO_SHARE_VERSION}.war
 
 
 # Download Share OAUTH plugin
 WORKDIR /webapps/share/WEB-INF/lib
-RUN curl ${REPO_SHARE_EXTRA}/org/sharextras/share-oauth/${ALFRESCO_OAUTH_VERSION}/share-oauth-repo-${ALFRESCO_OAUTH_VERSION}.jar \
-    -o share-oauth-repo-${ALFRESCO_OAUTH_VERSION}.jar
-
-
-# Deploy Alfresco Share Services in Tomcat
-WORKDIR /root/amp/
-RUN curl ${REPO}/org/alfresco/alfresco-share-services/${ALFRESCO_SHARE_SERVICES_VERSION}/alfresco-share-services-${ALFRESCO_SHARE_SERVICES_VERSION}.amp \
-    -o alfresco-share-services-${ALFRESCO_SHARE_SERVICES_VERSION}.amp
-
-WORKDIR /usr/local/tomcat
-RUN set -x && \
-    java -jar /root/alfresco-mmt.jar install /root/amp/ webapps/alfresco -nobackup -directory && \
-    rm /root/amp/alfresco-share-services-${ALFRESCO_SHARE_SERVICES_VERSION}.amp
-
-
-# Add PostgreSQL driver to Tomcat
-WORKDIR /usr/local/tomcat/lib
-RUN curl ${REPO}/postgresql/postgresql/${POSTGRES_CONNECTOR_VERSION}/postgresql-${POSTGRES_CONNECTOR_VERSION}.jar \
-    -o postgresql-${POSTGRES_CONNECTOR_VERSION}.jar
-
-
-# Add MySQL driver to Tomcat
-WORKDIR /usr/local/tomcat/lib
-RUN curl http://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-${MYSQL_CONNECTOR_VERSION}.tar.gz \
-    -o mysql-connector-java-${MYSQL_CONNECTOR_VERSION}.tar.gz
-RUN set -x \
-    tar xvzf mysql-connector-java-${MYSQL_CONNECTOR_VERSION}.tar.gz \
-             --strip-components 1 \
-             mysql-connector-java-${MYSQL_CONNECTOR_VERSION}/mysql-connector-java-${MYSQL_CONNECTOR_VERSION}-bin.jar && \
-    rm mysql-connector-java-${MYSQL_CONNECTOR_VERSION}.tar.gz
-
-# Deploy Alfresco PDF Render
-WORKDIR /usr/local/bin
-RUN curl ${REPO}/org/alfresco/alfresco-pdf-renderer/${ALFRESCO_PDF_RENDERER_VERSION}/alfresco-pdf-renderer-${ALFRESCO_PDF_RENDERER_VERSION}-linux.tgz \
-    -o alfresco-pdf-renderer-${ALFRESCO_PDF_RENDERER_VERSION}-linux.tgz
-RUN set -x \
-    tar xvvzf alfresco-pdf-renderer-${ALFRESCO_PDF_RENDERER_VERSION}-linux.tgz && \
-    tar xvvzf alfresco-pdf-renderer-${ALFRESCO_PDF_RENDERER_VERSION}-linux.tgz && \
-    ls -l && \
-    chmod +x alfresco-pdf-renderer && \
-    rm alfresco-pdf-renderer-${ALFRESCO_PDF_RENDERER_VERSION}-linux.tgz
+RUN curl ${REPO_SHARE_EXTRA}/org/sharextras/share-oauth/${ALFRESCO_OAUTH_VERSION}/share-oauth-${ALFRESCO_OAUTH_VERSION}.jar \
+    -o share-oauth-${ALFRESCO_OAUTH_VERSION}.jar
 
 
 # Create Directories
 WORKDIR /usr/local/tomcat
 RUN set -x && \
-    sed -i 's/^log4j.rootLogger.*/log4j.rootLogger=error, Console/' webapps/alfresco/WEB-INF/classes/log4j.properties && \
+    sed -i 's/^log4j.rootLogger.*/log4j.rootLogger=error, Console/' webapps/share/WEB-INF/classes/log4j.properties && \
     mkdir -p  shared/classes/alfresco/extension \
-              shared/classes/alfresco/messages \
-              shared/lib \
-              /var/lib/alf_data && \
+              shared/lib && \
     rm -rf /usr/share/doc \
            webapps/docs \
            webapps/examples \
@@ -106,6 +59,10 @@ RUN set -x && \
 
 # Tuning
 WORKDIR /usr/local/tomcat
+
+COPY assets/share-custom-config.xml shared/classes/alfresco/web-extension/share-config-custom.xml
+COPY assets/index.jsp /usr/local/tomcat/webapps/ROOT/
+
 RUN xmlstarlet ed \
     -P -S -L \
     -i '/Server/Service[@name="Catalina"]/Connector[@port="8080"]' -t 'attr' -n 'URIEncoding' -v 'UTF-8' \
@@ -136,16 +93,11 @@ RUN sed -i 's#^\(handlers = \).*$#\11catalina.org.apache.juli.FileHandler, 2loca
 # Cleanup
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/*
-#COPY assets/catalina.properties conf/catalina.properties
-#COPY assets/server.xml conf/server.xml
-#COPY assets/logging.properties conf/logging.properties
-#COPY assets/web.xml webapps/alfresco/WEB-INF/web.xml
-#COPY assets/alfresco-global.properties webapps/alfresco/WEB-INF/classes/alfresco-global.properties
 
 WORKDIR /usr/local/tomcat
 #WORKDIR /root
 
-VOLUME "/opt/alf_data/"
+EXPOSE 8080 8443
 
 COPY docker-entrypoint.sh /
 RUN chmod +x /docker-entrypoint.sh
