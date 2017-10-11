@@ -1,9 +1,11 @@
 #!/bin/bash
-CATALINA_HOME=/usr/local/tomcat
-ALF_HOME=${CATALINA_HOME}/webapps/alfresco
-ALF_BIN=${ALF_HOME}/bin
-ALF_SETUP=${ALF_HOME}/setup
+CATALINA_HOME='/usr/local/tomcat'
+ALF_HOME="${CATALINA_HOME}/webapps/alfresco"
+ALF_BIN="${ALF_HOME}/bin"
+ALF_SETUP="${ALF_HOME}/setup"
 DIR_ROOT=${DIR_ROOT:-'/var/lib/alf_data'}
+IMG_ROOT=${IMG_ROOT:-'/usr'}
+ALFRESCO_PDF_RENDERER_ROOT=${ALFRESCO_PDF_RENDERER_ROOT:-'/usr/local/bin'}
 
 ALFRESCO_HOSTNAME=${ALFRESCO_HOSTNAME:-127.0.0.1}
 ALFRESCO_PROTOCOL=${ALFRESCO_PROTOCOL:-http}
@@ -64,13 +66,13 @@ if [[ -v POSTGRES_ENV_GOSU_VERSION ]]; then
     fi
 fi
 
-DB_KIND=${DB_KIND:-postgresql}
-DB_DRIVER=${DB_DRIVER:-org.postgresql.Driver}
-DB_PORT=${DB_PORT:-5432}
-DB_USERNAME=${DB_USERNAME:-alfresco}
-DB_PASSWORD=${DB_PASSWORD:-admin}   
-DB_NAME=${DB_NAME:-alfresco}
-DB_HOST=${DB_HOST:-localhost}
+DB_KIND=${DB_KIND:-'postgresql'}
+DB_DRIVER=${DB_DRIVER:-'org.postgresql.Driver'}
+DB_PORT=${DB_PORT:-'5432'}
+DB_USERNAME=${DB_USERNAME:-'alfresco'}
+DB_PASSWORD=${DB_PASSWORD:-'admin'}   
+DB_NAME=${DB_NAME:-'alfresco'}
+DB_HOST=${DB_HOST:-'localhost'}
 
 if [ "$DB_KIND" == "mysql" ]; then
     DB_DRIVER='org.gjt.mm.mysql.Driver'
@@ -78,54 +80,62 @@ if [ "$DB_KIND" == "mysql" ]; then
     DB_CONN_PARAMS=${DB_CONN_PARAMS:-'?useSSL=false'}
 fi
 
-SYSTEM_SERVERMODE=${SYSTEM_SERVERMODE:-PRODUCTION}
+SYSTEM_SERVERMODE=${SYSTEM_SERVERMODE:-'PRODUCTION'}
 
-MAIL_HOST=${MAIL_HOST:-localhost}
-MAIL_PORT=${MAIL_PORT:-25}
+MAIL_HOST=${MAIL_HOST:-'localhost'}
+MAIL_PORT=${MAIL_PORT:-'25'}
 MAIL_SMTP_USERNAME=${MAIL_SMTP_USERNAME:-}
 MAIL_SMTP_PASSWORD=${MAIL_SMTP_PASSWORD:-}
-MAIL_FROM_DEFAULT=${MAIL_FROM_DEFAULT:-alfresco@alfresco.org}
-MAIL_PROTOCOL=${MAIL_PROTOCOL:-smtp}
-MAIL_SMTP_AUTH=${MAIL_SMTP_AUTH:-false}
-MAIL_SMTP_STARTTLS=${MAIL_SMTP_STARTTLS:-false}
-MAIL_SMTPS_AUTH=${MAIL_SMTPS_AUTH:-false}
-MAIL_SMTPS_STARTTLS_ENABLE=${MAIL_SMTPS_STARTTLS_ENABLE:-false}
-MAIL_FROM_DEFAULT_ENABLED=${MAIL_FROM_DEFAULT_ENABLED:-false}
-MAIL_ENCODING=${MAIL_ENCODING:-UTF-8}
-MAIL_SMTP_TIMEOUT=${MAIL_SMTP_TIMEOUT:-30000}
-MAIL_SMTP_DEBUG=${MAIL_SMTP_DEBUG:-false}
+MAIL_FROM_DEFAULT=${MAIL_FROM_DEFAULT:-'alfresco@alfresco.org'}
+MAIL_PROTOCOL=${MAIL_PROTOCOL:-'smtp'}
+MAIL_SMTP_AUTH=${MAIL_SMTP_AUTH:-'false'}
+MAIL_SMTP_STARTTLS=${MAIL_SMTP_STARTTLS:-'false'}
+MAIL_SMTPS_AUTH=${MAIL_SMTPS_AUTH:-'false'}
+MAIL_SMTPS_STARTTLS_ENABLE=${MAIL_SMTPS_STARTTLS_ENABLE:-'false'}
+MAIL_FROM_DEFAULT_ENABLED=${MAIL_FROM_DEFAULT_ENABLED:-'false'}
+MAIL_ENCODING=${MAIL_ENCODING:-'UTF-8'}
+MAIL_SMTP_TIMEOUT=${MAIL_SMTP_TIMEOUT:-'30000'}
+MAIL_SMTP_DEBUG=${MAIL_SMTP_DEBUG:-'false'}
 
-MAIL_TESTMESSAGE_SEND=${MAIL_TESTMESSAGE_SEND:-false}
+MAIL_TESTMESSAGE_SEND=${MAIL_TESTMESSAGE_SEND:-'false'}
 MAIL_TESTMESSAGE_TO=${MAIL_TESTMESSAGE_TO:-}
 MAIL_TESTMESSAGE_SUBJECT=${MAIL_TESTMESSAGE_SUBJECT:-"Alfresco - Service - SMTP client online"}
 MAIL_TESTMESSAGE_TEXT=${MAIL_TESTMESSAGE_TEXT:-"Alfresco SMTP client ready and working"}
 
-NOTIFICATION_EMAIL_SITEINVITE=${NOTIFICATION_EMAIL_SITEINVITE:-false}
+NOTIFICATION_EMAIL_SITEINVITE=${NOTIFICATION_EMAIL_SITEINVITE:-'false'}
 
-FTP_PORT=${FTP_PORT:-21}
+FTP_PORT=${FTP_PORT:-'21'}
 
-CIFS_ENABLED=${CIFS_ENABLED:-true}
-CIFS_SERVER_NAME=${CIFS_SERVER_NAME:-localhost}
-CIFS_DOMAIN=${CIFS_DOMAIN:-WORKGROUP}
+CIFS_ENABLED=${CIFS_ENABLED:-'true'}
+CIFS_SERVER_NAME=${CIFS_SERVER_NAME:-'localhost'}
+CIFS_DOMAIN=${CIFS_DOMAIN:-'WORKGROUP'}
 
-LDAP_ENABLED=${LDAP_ENABLED:-false}
-LDAP_KIND=${LDAP_KIND:-ldap}
-LDAP_AUTH_USERNAMEFORMAT=${LDAP_AUTH_USERNAMEFORMAT:-uid=%s,cn=users,cn=accounts,dc=example,dc=com}
-LDAP_URL=${LDAP_URL:-ldap://ldap.example.com:389}
-LDAP_DEFAULT_ADMINS=${LDAP_DEFAULT_ADMINS:-admin}
-LDAP_SECURITY_PRINCIPAL=${LDAP_SECURITY_PRINCIPAL:-uid=admin,cn=users,cn=accounts,dc=example,dc=com}
-LDAP_SECURITY_CREDENTIALS=${LDAP_SECURITY_CREDENTIALS:-password}
-LDAP_GROUP_SEARCHBASE=${LDAP_GROUP_SEARCHBASE:-cn=groups,cn=accounts,dc=example,dc=com}
-LDAP_USER_SEARCHBASE=${LDAP_USER_SEARCHBASE:-cn=users,cn=accounts,dc=example,dc=com}
+LDAP_ENABLED=${LDAP_ENABLED:-'false'}
+LDAP_KIND=${LDAP_KIND:-'ldap'}
+LDAP_AUTH_USERNAMEFORMAT=${LDAP_AUTH_USERNAMEFORMAT:-'uid=%s,cn=users,cn=accounts,dc=example,dc=com'}
+LDAP_URL=${LDAP_URL:-ldap://ldap.example.com:'389'}
+LDAP_DEFAULT_ADMINS=${LDAP_DEFAULT_ADMINS:-'admin'}
+LDAP_SECURITY_PRINCIPAL=${LDAP_SECURITY_PRINCIPAL:-'uid=admin,cn=users,cn=accounts,dc=example,dc=com'}
+LDAP_SECURITY_CREDENTIALS=${LDAP_SECURITY_CREDENTIALS:-'password'}
+LDAP_GROUP_SEARCHBASE=${LDAP_GROUP_SEARCHBASE:-'cn=groups,cn=accounts,dc=example,dc=com'}
+LDAP_USER_SEARCHBASE=${LDAP_USER_SEARCHBASE:-'cn=users,cn=accounts,dc=example,dc=com'}
 
 CONTENT_STORE=${CONTENT_STORE:-\$\{dir.root\}}
 
 REVERSE_PROXY_URL=${REVERSE_PROXY_URL:-}
 
-OOO_ENABLED=${OOO_ENABLED:-true}
-OOO_EXE=${OOO_EXE:-soffice}
-OOO_HOST=${OOO_HOST:-libreoffice}
-OOO_PORT=${OOO_PORT:-8100}
+OOO_ENABLED=${OOO_ENABLED:-'true'}
+OOO_EXE=${OOO_EXE:-'soffice'}
+OOO_HOST=${OOO_HOST:-'libreoffice'}
+OOO_PORT=${OOO_PORT:-'8100'}
+
+SOLR_INDEX_SUBSYSTEM=${SOLR_INDEX_SUBSYSTEM:-'solr6'}
+SOLR_HOST=${SOLR_HOST:-'solr'}
+SOLR_PORT=${SOLR_PORT:-'8080'}
+SOLR_PORT_SSL=${SOLR_PORT_SSL:-'8443'}
+SOLR_MAX_TOTAL={$SOLR_MAX_TOTAL:-'40'}
+SOLR_MAX_HOSTS={$SOLR_MAX_HOSTS:-'40'}
+SOLR_SECURECOMMS=${SOLR_SECURECOMMS:-'none'}
 
 function cfg_replace_option {
   grep "$1" "$3" > /dev/null
@@ -168,6 +178,17 @@ function tweak_alfresco {
   # libreoffice
   cfg_replace_option ooo.enabled $OOO_ENABLED $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option ooo.exe $OOO_EXE $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option ooo.host $OOO_HOST $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option ooo.port $OOO_PORT $ALFRESCO_GLOBAL_PROPERTIES
+
+  # Solr
+  cfg_replace_option index.subsystem.name $SOLR_INDEX_SUBSYSTEM $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option solr.host $SOLR_HOST $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option solr.port $SOLR_PORT $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option solr.port.ssl $SOLR_PORT_SSL $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option solr.max.total.connections $SOLR_MAX_TOTAL $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option solr.max.host.connections $SOLR_MAX_HOSTS $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option solr.secureComms $SOLR_SECURECOMMS $ALFRESCO_GLOBAL_PROPERTIES
 
   # @see https://forums.alfresco.com/en/viewtopic.php?f=8&t=20893
   # CIFS works, but you have to login as a native Alfresco account, like admin
@@ -226,6 +247,8 @@ function tweak_alfresco {
   cfg_replace_option dir.root "${DIR_ROOT}" $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option dir.contentstore "${CONTENT_STORE}/contentstore" $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option dir.contentstore.deleted "${CONTENT_STORE}/contentstore.deleted" $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option img.root "${IMG_ROOT}" $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option alfresco-pdf-renderer.root "${ALFRESCO_PDF_RENDERER_ROOT}" $ALFRESCO_GLOBAL_PROPERTIES
 }
 
 function set_reverse_proxy {

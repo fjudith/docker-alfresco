@@ -14,6 +14,7 @@ ENV MD_PREVIEW="https://github.com/fjudith/md-preview"
 ENV ALFRESCO_MMT_VERSION='5.2.g'
 ENV ALFRESCO_PLATFORM_VERSION='5.2.g'
 ENV ALFRESCO_SHARE_SERVICES_VERSION='5.2.f'
+ENV ALFRESCO_PDF_RENDERER_VERSION='1.0'
 ENV POSTGRES_CONNECTOR_VERSION='9.2-1002.jdbc4'
 ENV MYSQL_CONNECTOR_VERSION='5.1.38'
 ENV MD_PREVIEW_VERSION='1.3.0'
@@ -27,24 +28,26 @@ RUN set -x && \
 
 # Download Alfresco Module Management
 WORKDIR /root
-ADD ${REPO}/org/alfresco/alfresco-mmt/${ALFRESCO_MMT_VERSION}/alfresco-mmt-${ALFRESCO_MMT_VERSION}.jar \
-    alfresco-mmt.jar
-RUN mkdir -p ./amp
+RUN curl ${REPO}/org/alfresco/alfresco-mmt/${ALFRESCO_MMT_VERSION}/alfresco-mmt-${ALFRESCO_MMT_VERSION}.jar \
+    -o alfresco-mmt.jar && \
+    mkdir -p ./amp
 
 
 # Deploy Alfresco Platform in Tomcat
 WORKDIR /usr/local/tomcat
-ADD ${REPO}/org/alfresco/alfresco-platform/${ALFRESCO_PLATFORM_VERSION}/alfresco-platform-${ALFRESCO_PLATFORM_VERSION}.war \
-    alfresco-platform-${ALFRESCO_PLATFORM_VERSION}.war
-RUN set -x && \
+RUN curl ${REPO}/org/alfresco/alfresco-platform/${ALFRESCO_PLATFORM_VERSION}/alfresco-platform-${ALFRESCO_PLATFORM_VERSION}.war \
+    -o alfresco-platform-${ALFRESCO_PLATFORM_VERSION}.war && \
+    set -x && \
     unzip -q alfresco-platform-${ALFRESCO_PLATFORM_VERSION}.war -d webapps/alfresco && \
     rm alfresco-platform-${ALFRESCO_PLATFORM_VERSION}.war
 
 
 # Deploy Alfresco Share Services in Tomcat
+WORKDIR /root/amp/
+RUN curl ${REPO}/org/alfresco/alfresco-share-services/${ALFRESCO_SHARE_SERVICES_VERSION}/alfresco-share-services-${ALFRESCO_SHARE_SERVICES_VERSION}.amp \
+    -o alfresco-share-services-${ALFRESCO_SHARE_SERVICES_VERSION}.amp
+
 WORKDIR /usr/local/tomcat
-ADD ${REPO}/org/alfresco/alfresco-share-services/${ALFRESCO_SHARE_SERVICES_VERSION}/alfresco-share-services-${ALFRESCO_SHARE_SERVICES_VERSION}.amp \
-    /root/amp/alfresco-share-services-${ALFRESCO_SHARE_SERVICES_VERSION}.amp
 RUN set -x && \
     java -jar /root/alfresco-mmt.jar install /root/amp/ webapps/alfresco -nobackup -directory && \
     rm /root/amp/alfresco-share-services-${ALFRESCO_SHARE_SERVICES_VERSION}.amp
@@ -52,19 +55,31 @@ RUN set -x && \
 
 # Add PostgreSQL driver to Tomcat
 WORKDIR /usr/local/tomcat/lib
-ADD ${REPO}/postgresql/postgresql/${POSTGRES_CONNECTOR_VERSION}/postgresql-${POSTGRES_CONNECTOR_VERSION}.jar \
-    postgresql-${POSTGRES_CONNECTOR_VERSION}.jar
+RUN curl ${REPO}/postgresql/postgresql/${POSTGRES_CONNECTOR_VERSION}/postgresql-${POSTGRES_CONNECTOR_VERSION}.jar \
+    -o postgresql-${POSTGRES_CONNECTOR_VERSION}.jar
 
 
 # Add MySQL driver to Tomcat
 WORKDIR /usr/local/tomcat/lib
-ADD http://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-${MYSQL_CONNECTOR_VERSION}.tar.gz \
-    mysql-connector-java-${MYSQL_CONNECTOR_VERSION}.tar.gz
+RUN curl http://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-${MYSQL_CONNECTOR_VERSION}.tar.gz \
+    -o mysql-connector-java-${MYSQL_CONNECTOR_VERSION}.tar.gz
 RUN set -x \
     tar xvzf mysql-connector-java-${MYSQL_CONNECTOR_VERSION}.tar.gz \
              --strip-components 1 \
              mysql-connector-java-${MYSQL_CONNECTOR_VERSION}/mysql-connector-java-${MYSQL_CONNECTOR_VERSION}-bin.jar && \
     rm mysql-connector-java-${MYSQL_CONNECTOR_VERSION}.tar.gz
+
+# Deploy Alfresco PDF Render
+WORKDIR /usr/local/bin
+RUN curl ${REPO}/org/alfresco/alfresco-pdf-renderer/${ALFRESCO_PDF_RENDERER_VERSION}/alfresco-pdf-renderer-${ALFRESCO_PDF_RENDERER_VERSION}-linux.tgz \
+    -o alfresco-pdf-renderer-${ALFRESCO_PDF_RENDERER_VERSION}-linux.tgz
+RUN set -x \
+    tar xvvzf alfresco-pdf-renderer-${ALFRESCO_PDF_RENDERER_VERSION}-linux.tgz && \
+    tar xvvzf alfresco-pdf-renderer-${ALFRESCO_PDF_RENDERER_VERSION}-linux.tgz && \
+    ls -l && \
+    chmod +x alfresco-pdf-renderer && \
+    rm alfresco-pdf-renderer-${ALFRESCO_PDF_RENDERER_VERSION}-linux.tgz
+
 
 # Create Directories
 WORKDIR /usr/local/tomcat
@@ -102,10 +117,11 @@ RUN sed -i 's#^\(handlers = \).*$#\11catalina.org.apache.juli.FileHandler, 2loca
     sed -i 's#^\(3catalina.org.apache.juli.FileHandler.prefix = \).*$#\1manager.#g' conf/logging.properties && \
     sed -i 's#^\(4catalina.org.apache.juli.FileHandler.level = \).*$#\1FINE#g' conf/logging.properties && \
     sed -i 's#^\(4catalina.org.apache.juli.FileHandler.directory = \).*$#\1${catalina.base}/logs#g' conf/logging.properties && \
-    sed -i 's#^\(4catalina.org.apache.juli.FileHandler.prefix = \).*$#\1host-manager.#g' conf/logging.properties
-RUN sed -i 's#^\(org.apache.catalina.core.ContainerBase.\[Catalina\].\[localhost\].handlers = \).*$#\12localhost.org.apache.juli.FileHandler, java.util.logging.ConsoleHandler#g' conf/logging.properties && \
+    sed -i 's#^\(4catalina.org.apache.juli.FileHandler.prefix = \).*$#\1host-manager.#g' conf/logging.properties && \
+    sed -i 's#^\(org.apache.catalina.core.ContainerBase.\[Catalina\].\[localhost\].handlers = \).*$#\12localhost.org.apache.juli.FileHandler, java.util.logging.ConsoleHandler#g' conf/logging.properties && \
     sed -i 's#^\(org.apache.catalina.core.ContainerBase.\[Catalina\].\[localhost\].\[/manager\].handlers = \).*$#\13manager.org.apache.juli.FileHandler, java.util.logging.ConsoleHandler#g' conf/logging.properties && \
     sed -i 's#^\(org.apache.catalina.core.ContainerBase.\[Catalina\].\[localhost\].\[/host-manager\].handlers = \).*$#\14host-manager.org.apache.juli.FileHandler, java.util.logging.ConsoleHandler#g' conf/logging.properties
+
 
 # Cleanup
 RUN apt-get clean && \
