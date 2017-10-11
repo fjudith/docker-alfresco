@@ -14,9 +14,18 @@ pipeline {
                 script {
                     if ("${BRANCH_NAME}" == "master"){
                         TAG = "latest"
+                        OOO = "libreoffice"
+                        ALF_PL = "platform"
+                        ALF_SH = "share"
+                        ALF_SO = "solr"
                     }
                     else {
                         TAG = "${BRANCH_NAME}"
+                        OOO = "${BRANCH_NAME}-libreoffice"
+                        ALF_PL = "${BRANCH_NAME}-platform"
+                        ALF_SH = "${BRANCH_NAME}-share"
+                        ALF_SO = "${BRANCH_NAME}-solr"
+                        
                     }
                 }
                 sh 'printenv'
@@ -82,12 +91,66 @@ pipeline {
                         }
                     }
                 }
+                stage ('Alfresco LibreOffice') {
+                    agent { label 'docker'}
+                    steps {
+                        unstash 'manual-manager'
+                        unstash 'md-preview'
+                        sh 'tree -sh'
+                        sh "docker build -f libreoffice/Dockerfile -t ${REPO}:${GIT_COMMIT}-libreoffice libreoffice/"
+                        sh "docker run -d --name 'libreoffice-${BUILD_NUMBER}' -p 56082:8100 ${REPO}:${GIT_COMMIT}-libreoffice"
+                        sh "docker ps -a"
+                        sleep 300
+                        sh "docker logs libreoffice-${BUILD_NUMBER}"
+                        sh 'docker run --rm --link libreoffice-${BUILD_NUMBER}:libreoffice blitznote/debootstrap-amd64:17.04 bash -c "curl -i -X GET -u admin:admin http://libreoffice:8100"'
+                    }
+                    post {
+                        always {
+                           sh 'docker rm -f libreoffice-${BUILD_NUMBER}'
+                        }
+                        success {
+                            echo 'Tag and Push to private registry'
+                            sh "docker tag ${REPO}:${GIT_COMMIT}-libreoffice ${REPO}:${OOO}"
+                            sh "docker tag ${REPO}:${GIT_COMMIT}-libreoffice ${PRIVATE_REPO}:${OOO}"
+                            sh "docker login -u ${DOCKER_PRIVATE_USR} -p ${DOCKER_PRIVATE_PSW} ${PRIVATE_REGISTRY}"
+                            sh "docker push ${PRIVATE_REPO}"
+                        }
+                    }
+                }
+                stage ('Alfresco Platform Services') {
+                    agent { label 'docker'}
+                    steps {
+                        unstash 'manual-manager'
+                        unstash 'md-preview'
+                        sh 'tree -sh'
+                        sh "docker build -f platform/Dockerfile -t ${REPO}:${GIT_COMMIT} platform/"
+                        sh "docker run -d --name 'postgres-${BUILD_NUMBER}' -e POSTGRES_USER=alfresco -e POSTGRES_PASSWORD=alfresco -POSTGRES_DB=alfresco amd64/postgres:9.4"
+                        sh "docker run -d --name 'platform-${BUILD_NUMBER}' --link postgres-${BUILD_NUMBER}:postgres --link libreoffice-${BUILD_NUMBER}:libreoffice -p 56080:8080 -p 56443:8443 ${REPO}:${GIT_COMMIT}"
+                        sh "docker ps -a"
+                        sleep 300
+                        sh "docker logs platform-${BUILD_NUMBER}"
+                        sh 'docker run --rm --link platform-${BUILD_NUMBER}:platform blitznote/debootstrap-amd64:17.04 bash -c "curl -i -X GET -u admin:admin http://platform:8080/alfresco/service/api/audit/control"'
+                    }
+                    post {
+                        always {
+                           sh 'docker rm -f platform-${BUILD_NUMBER}'
+                        }
+                        success {
+                            echo 'Tag and Push to private registry'
+                            sh "docker tag ${REPO}:${GIT_COMMIT}-platform ${REPO}:${ALF_PL}"
+                            sh "docker tag ${REPO}:${GIT_COMMIT}-platform ${PRIVATE_REPO}:${ALF_PL}"
+                            sh "docker login -u ${DOCKER_PRIVATE_USR} -p ${DOCKER_PRIVATE_PSW} ${PRIVATE_REGISTRY}"
+                            sh "docker push ${PRIVATE_REPO}"
+                        }
+                    }
+                }
             }
         }
     }
     post {
         always {
             echo 'Run regardless of the completion status of the Pipeline run.'
+            sh 'docker rm -f postgres-${BUILD_NUMBER}'
         }
         changed {
             echo 'Only run if the current Pipeline run has a different status from the previously completed Pipeline.'

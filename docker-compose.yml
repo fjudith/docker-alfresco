@@ -8,7 +8,12 @@ services:
     image: postgres:9.4
     volumes:
       - /var/lib/postgresql/data
-  alfresco:
+  libreoffice:
+    build: libreoffice/
+    image: fjudith/alfresco:libreoffice
+    ports:
+      - "8100:8100"
+  platform:
     environment:
       DB_HOST: postgres
       DB_KIND: postgresql
@@ -23,10 +28,11 @@ services:
       #LDAP_SECURITY_PRINCIPAL: uid=admin,cn=users,cn=accounts,dc=example,dc=com
       #LDAP_URL: ldap://ipa.example.com:389
       #LDAP_USER_SEARCHBASE: cn=users,cn=accounts,dc=example,dc=com
-    build: .
+    build: platform/
     image: fjudith/alfresco:platform
     links:
       - postgresql:postgres
+      - libreoffice:libreoffice
     ports:
       - "21:21"
       - "137:137"
