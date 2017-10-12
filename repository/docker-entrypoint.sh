@@ -3,7 +3,9 @@ CATALINA_HOME='/usr/local/tomcat'
 ALF_HOME="${CATALINA_HOME}/webapps/alfresco"
 ALF_BIN="${ALF_HOME}/bin"
 ALF_SETUP="${ALF_HOME}/setup"
-DIR_ROOT=${DIR_ROOT:-'/var/lib/alf_data'}
+DIR_ROOT=${DIR_ROOT:-'/var/lib/alfresco/alf_data'}
+CONTENT_STORE=${CONTENT_STORE:-'${dir.root}/contentstore'}
+CONTENT_STORE_DELETED=${CONTENT_STORE_DELETED:-'${dir.root}/contentstore.deleted'}
 IMG_ROOT=${IMG_ROOT:-'/usr'}
 ALFRESCO_PDF_RENDERER_ROOT=${ALFRESCO_PDF_RENDERER_ROOT:-'/usr/local/bin'}
 
@@ -99,11 +101,12 @@ MAIL_SMTP_DEBUG=${MAIL_SMTP_DEBUG:-'false'}
 
 MAIL_TESTMESSAGE_SEND=${MAIL_TESTMESSAGE_SEND:-'false'}
 MAIL_TESTMESSAGE_TO=${MAIL_TESTMESSAGE_TO:-}
-MAIL_TESTMESSAGE_SUBJECT=${MAIL_TESTMESSAGE_SUBJECT:-"Alfresco - Service - SMTP client online"}
-MAIL_TESTMESSAGE_TEXT=${MAIL_TESTMESSAGE_TEXT:-"Alfresco SMTP client ready and working"}
+MAIL_TESTMESSAGE_SUBJECT=${MAIL_TESTMESSAGE_SUBJECT:-"Alfresco - Service - Engine online"}
+MAIL_TESTMESSAGE_TEXT=${MAIL_TESTMESSAGE_TEXT:-"Alfresco engine initialized and ready to accept connection"}
 
 NOTIFICATION_EMAIL_SITEINVITE=${NOTIFICATION_EMAIL_SITEINVITE:-'false'}
 
+FTP_ENABLED=${FTP_ENABLED:-'false'}
 FTP_PORT=${FTP_PORT:-'21'}
 
 CIFS_ENABLED=${CIFS_ENABLED:-'true'}
@@ -119,8 +122,6 @@ LDAP_SECURITY_PRINCIPAL=${LDAP_SECURITY_PRINCIPAL:-'uid=admin,cn=users,cn=accoun
 LDAP_SECURITY_CREDENTIALS=${LDAP_SECURITY_CREDENTIALS:-'password'}
 LDAP_GROUP_SEARCHBASE=${LDAP_GROUP_SEARCHBASE:-'cn=groups,cn=accounts,dc=example,dc=com'}
 LDAP_USER_SEARCHBASE=${LDAP_USER_SEARCHBASE:-'cn=users,cn=accounts,dc=example,dc=com'}
-
-CONTENT_STORE=${CONTENT_STORE:-\$\{dir.root\}}
 
 REVERSE_PROXY_URL=${REVERSE_PROXY_URL:-}
 
@@ -174,6 +175,7 @@ function tweak_alfresco {
   cfg_replace_option db.name $DB_NAME $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option db.url "jdbc:${DB_KIND,,}://${DB_HOST}:${DB_PORT}/${DB_NAME}${DB_CONN_PARAMS}" $ALFRESCO_GLOBAL_PROPERTIES
 
+  cfg_replace_option ftp.enabled $FTP_ENABLED $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option ftp.port $FTP_PORT $ALFRESCO_GLOBAL_PROPERTIES
 
   # libreoffice
@@ -246,10 +248,13 @@ function tweak_alfresco {
   fi
 
   # content store
-  if ! [ -d ${DIR_ROOT} ]; then mkdir -p ${DIR_ROOT}; fi
+  if [ ! -d ${DIR_ROOT} ]; then mkdir -p ${DIR_ROOT}; fi
+
   cfg_replace_option dir.root "${DIR_ROOT}" $ALFRESCO_GLOBAL_PROPERTIES
-  cfg_replace_option dir.contentstore "${CONTENT_STORE}/contentstore" $ALFRESCO_GLOBAL_PROPERTIES
-  cfg_replace_option dir.contentstore.deleted "${CONTENT_STORE}/contentstore.deleted" $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option dir.contentstore "${CONTENT_STORE}" $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option dir.contentstore.deleted "${CONTENT_STORE_DELETED}" $ALFRESCO_GLOBAL_PROPERTIES
+  
+  # Binaries
   cfg_replace_option img.root "${IMG_ROOT}" $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option alfresco-pdf-renderer.root "${ALFRESCO_PDF_RENDERER_ROOT}" $ALFRESCO_GLOBAL_PROPERTIES
 }

@@ -16,6 +16,7 @@ ENV ALF_BIN=alfresco-community-installer-201707-linux-x64.bin
 RUN set -x && \
     apt-get update -yqq && \
     apt-get install --no-install-recommends -yqq \
+        dnsutils \
         bash \
         patch \
         libcups2 \

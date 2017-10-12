@@ -16,10 +16,12 @@ ENV REPO_SHARE_EXTRA="https://artifacts.alfresco.com/nexus/service/local/reposit
 ENV ALFRESCO_OAUTH_VERSION='2.3.0'
 ENV AIKAU_VERSION='1.0.102'
 ENV GOOGLE_DOCS_VERSION='3.0.4.2'
+ENV MD_PREVIEW_VERSION='1.3.0'
 
 RUN set -x && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
+        dnsutils \
         xmlstarlet
 
 
@@ -31,7 +33,7 @@ RUN curl ${REPO}/org/alfresco/alfresco-mmt/${ALFRESCO_MMT_VERSION}/alfresco-mmt-
 
 
 # Deploy Alfresco Platform in Tomcat
-WORKDIR /usr/local/tomcat
+WORKDIR ${CATALINA_HOME}
 RUN curl ${REPO}/org/alfresco/share/${ALFRESCO_SHARE_VERSION}/share-${ALFRESCO_SHARE_VERSION}.war \
     -o share-${ALFRESCO_SHARE_VERSION}.war && \
     set -x && \
@@ -39,14 +41,8 @@ RUN curl ${REPO}/org/alfresco/share/${ALFRESCO_SHARE_VERSION}/share-${ALFRESCO_S
     rm share-${ALFRESCO_SHARE_VERSION}.war
 
 
-# Download Share OAUTH plugin
-WORKDIR /webapps/share/WEB-INF/lib
-RUN curl ${REPO_SHARE_EXTRA}/org/sharextras/share-oauth/${ALFRESCO_OAUTH_VERSION}/share-oauth-${ALFRESCO_OAUTH_VERSION}.jar \
-    -o share-oauth-${ALFRESCO_OAUTH_VERSION}.jar
-
-
 # Download Aikau plugin
-WORKDIR /webapps/share/WEB-INF/lib
+WORKDIR ${CATALINA_HOME}/webapps/share/WEB-INF/lib
 RUN curl ${REPO}/org/alfresco/aikau/${AIKAU_VERSION}/aikau-${AIKAU_VERSION}.jar \
     -o aikau-${AIKAU_VERSION}.jar
 
@@ -55,14 +51,23 @@ WORKDIR /root/amp/
 RUN curl ${REPO}/org/alfresco/integrations/alfresco-googledocs-share/${GOOGLE_DOCS_VERSION}/alfresco-googledocs-share-${GOOGLE_DOCS_VERSION}.amp \
     -o alfresco-googledocs-share-${GOOGLE_DOCS_VERSION}.amp
 
-WORKDIR /usr/local/tomcat
+WORKDIR ${CATALINA_HOME}
 RUN set -x && \
     java -jar /root/alfresco-mmt.jar install /root/amp/ webapps/share -nobackup -directory && \
     rm /root/amp/alfresco-googledocs-share-${GOOGLE_DOCS_VERSION}.amp
 
+# Deploy Alfresco md-preview in Tomcat
+WORKDIR /root/amp/
+RUN curl https://github.com/fjudith/md-preview/releases/download/${MD_PREVIEW_VERSION}/parashift-mdpreview-share-${MD_PREVIEW_VERSION}.amp \
+    -o parashift-mdpreview-share-${MD_PREVIEW_VERSION}.amp
+
+WORKDIR ${CATALINA_HOME}
+RUN set -x && \
+    java -jar /root/alfresco-mmt.jar install /root/amp/parashift-mdpreview-share-${MD_PREVIEW_VERSION}.amp webapps/share -nobackup -directory && \
+    rm /root/amp/parashift-mdpreview-share-${MD_PREVIEW_VERSION}.amp
 
 # Create Directories
-WORKDIR /usr/local/tomcat
+WORKDIR ${CATALINA_HOME}
 RUN set -x && \
     sed -i 's/^log4j.rootLogger.*/log4j.rootLogger=error, Console/' webapps/share/WEB-INF/classes/log4j.properties && \
     mkdir -p  shared/classes/alfresco/extension \
@@ -75,10 +80,10 @@ RUN set -x && \
 
 
 # Tuning
-WORKDIR /usr/local/tomcat
+WORKDIR ${CATALINA_HOME}
 
 COPY assets/share-custom-config.xml shared/classes/alfresco/web-extension/share-config-custom.xml
-COPY assets/index.jsp /usr/local/tomcat/webapps/ROOT/
+COPY assets/index.jsp ${CATALINA_HOME}/webapps/ROOT/
 
 RUN xmlstarlet ed \
     -P -S -L \
@@ -124,7 +129,7 @@ RUN sed -i 's#^\(handlers = \).*$#\11catalina.org.apache.juli.FileHandler, 2loca
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-WORKDIR /usr/local/tomcat
+WORKDIR ${CATALINA_HOME}
 #WORKDIR /root
 
 EXPOSE 8080 8443

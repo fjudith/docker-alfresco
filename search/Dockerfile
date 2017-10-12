@@ -15,6 +15,7 @@ ENV ALFRESCO_SEARCH_SERVICE_VERSION=1.1.0
 RUN set -x && \
     apt-get update -yqq && \
     apt-get install --no-install-recommends -yqq \
+        dnsutils \
         supervisor \
         curl \
         procps \
@@ -32,6 +33,8 @@ RUN set -x && \
     rm alfresco-search-services-${ALFRESCO_SEARCH_SERVICE_VERSION}.zip
 
 COPY assets/supervisord.conf /etc/supervisord.conf
+
+WORKDIR /usr/share/alfresco-search-services
 
 COPY docker-entrypoint.sh /
 RUN chmod +x /docker-entrypoint.sh
