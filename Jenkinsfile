@@ -14,17 +14,17 @@ pipeline {
                 script {
                     if ("${BRANCH_NAME}" == "master"){
                         TAG = "latest"
-                        OOO = "libreoffice"
-                        ALF_PL = "platform"
-                        ALF_SH = "share"
-                        ALF_SO = "search"
+                        ALF_OOO = "libreoffice"
+                        ALF_REPO = "platform"
+                        ALF_SHA = "share"
+                        ALF_SEARCH = "search"
                     }
                     else {
                         TAG = "${BRANCH_NAME}"
-                        OOO = "${BRANCH_NAME}-libreoffice"
-                        ALF_PL = "${BRANCH_NAME}-platform"
-                        ALF_SH = "${BRANCH_NAME}-share"
-                        ALF_SO = "${BRANCH_NAME}-search"                        
+                        ALF_OOO = "${BRANCH_NAME}-libreoffice"
+                        ALF_REPO = "${BRANCH_NAME}-platform"
+                        ALF_SHA = "${BRANCH_NAME}-share"
+                        ALF_SEARCH = "${BRANCH_NAME}-search"                        
                     }
                 }
                 sh 'printenv'
@@ -107,10 +107,10 @@ pipeline {
                         }
                         success {
                             echo 'Tag and Push to private registry'
-                            sh "docker tag ${REPO}:${GIT_COMMIT}-libreoffice ${REPO}:${OOO}"
-                            sh "docker tag ${REPO}:${GIT_COMMIT}-libreoffice ${PRIVATE_REPO}:${OOO}"
+                            sh "docker tag ${REPO}:${GIT_COMMIT}-libreoffice ${REPO}:${ALF_OOO}"
+                            sh "docker tag ${REPO}:${GIT_COMMIT}-libreoffice ${PRIVATE_REPO}:${ALF_OOO}"
                             sh "docker login -u ${DOCKER_PRIVATE_USR} -p ${DOCKER_PRIVATE_PSW} ${PRIVATE_REGISTRY}"
-                            sh "docker push ${PRIVATE_REPO}:${OOO}"
+                            sh "docker push ${PRIVATE_REPO}:${ALF_OOO}"
                         }
                     }
                 }
@@ -131,10 +131,10 @@ pipeline {
                         }
                         success {
                             echo 'Tag and Push to private registry'
-                            sh "docker tag ${REPO}:${GIT_COMMIT}-search ${REPO}:${ALF_SO}"
-                            sh "docker tag ${REPO}:${GIT_COMMIT}-search ${PRIVATE_REPO}:${ALF_SO}"
+                            sh "docker tag ${REPO}:${GIT_COMMIT}-search ${REPO}:${ALF_SEARCH}"
+                            sh "docker tag ${REPO}:${GIT_COMMIT}-search ${PRIVATE_REPO}:${ALF_SEARCH}"
                             sh "docker login -u ${DOCKER_PRIVATE_USR} -p ${DOCKER_PRIVATE_PSW} ${PRIVATE_REGISTRY}"
-                            sh "docker push ${PRIVATE_REPO}:${ALF_SO}"
+                            sh "docker push ${PRIVATE_REPO}:${ALF_SEARCH}"
                         }
                     }
                 }
@@ -158,10 +158,10 @@ pipeline {
                         }
                         success {
                             echo 'Tag and Push to private registry'
-                            sh "docker tag ${REPO}:${GIT_COMMIT}-platform ${REPO}:${ALF_PL}"
-                            sh "docker tag ${REPO}:${GIT_COMMIT}-platform ${PRIVATE_REPO}:${ALF_PL}"
+                            sh "docker tag ${REPO}:${GIT_COMMIT}-platform ${REPO}:${ALF_REPO}"
+                            sh "docker tag ${REPO}:${GIT_COMMIT}-platform ${PRIVATE_REPO}:${ALF_REPO}"
                             sh "docker login -u ${DOCKER_PRIVATE_USR} -p ${DOCKER_PRIVATE_PSW} ${PRIVATE_REGISTRY}"
-                            sh "docker push ${PRIVATE_REPO}:${ALF_PL}"
+                            sh "docker push ${PRIVATE_REPO}:${ALF_REPO}"
                         }
                     }
                 }
@@ -185,8 +185,8 @@ pipeline {
                         }
                         success {
                             echo 'Tag and Push to private registry'
-                            sh "docker tag ${REPO}:${GIT_COMMIT}-share ${REPO}:${ALF_SH}"
-                            sh "docker tag ${REPO}:${GIT_COMMIT}-share ${PRIVATE_REPO}:${ALF_SH}"
+                            sh "docker tag ${REPO}:${GIT_COMMIT}-share ${REPO}:${ALF_SHA}"
+                            sh "docker tag ${REPO}:${GIT_COMMIT}-share ${PRIVATE_REPO}:${ALF_SHA}"
                             sh "docker login -u ${DOCKER_PRIVATE_USR} -p ${DOCKER_PRIVATE_PSW} ${PRIVATE_REGISTRY}"
                             sh "docker push ${PRIVATE_REPO}"
                         }

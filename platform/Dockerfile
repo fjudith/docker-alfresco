@@ -20,6 +20,9 @@ ENV ALFRESCO_OAUTH_VERSION='2.3.0'
 ENV POSTGRES_CONNECTOR_VERSION='9.2-1002.jdbc4'
 ENV MYSQL_CONNECTOR_VERSION='5.1.38'
 ENV MD_PREVIEW_VERSION='1.3.0'
+ENV AOS_MODULE_VERSION='1.1.6'
+ENV AIKAU_VERSION='1.0.102'
+ENV GOOGLE_DOCS_VERSION='2.0.4-11'
 
 RUN set -x && \
     apt-get update && \
@@ -45,9 +48,15 @@ RUN curl ${REPO}/org/alfresco/alfresco-platform/${ALFRESCO_PLATFORM_VERSION}/alf
 
 
 # Download Share OAUTH plugin
-WORKDIR /webapps/share/WEB-INF/lib
+WORKDIR /webapps/alfresco/WEB-INF/lib
 RUN curl ${REPO_SHARE_EXTRA}/org/sharextras/share-oauth/${ALFRESCO_OAUTH_VERSION}/share-oauth-repo-${ALFRESCO_OAUTH_VERSION}.jar \
     -o share-oauth-repo-${ALFRESCO_OAUTH_VERSION}.jar
+
+
+# Download Aikau plugin
+WORKDIR /webapps/alfresco/WEB-INF/lib
+RUN curl ${REPO}/org/alfresco/aikau/${AIKAU_VERSION}/aikau-${AIKAU_VERSION}.jar \
+    -o aikau-${AIKAU_VERSION}.jar
 
 
 # Deploy Alfresco Share Services in Tomcat
@@ -59,6 +68,28 @@ WORKDIR /usr/local/tomcat
 RUN set -x && \
     java -jar /root/alfresco-mmt.jar install /root/amp/ webapps/alfresco -nobackup -directory && \
     rm /root/amp/alfresco-share-services-${ALFRESCO_SHARE_SERVICES_VERSION}.amp
+
+
+# Deploy Alfresco Office Services in Tomcat
+WORKDIR /root/amp/
+RUN curl ${REPO}/org/alfresco/aos-module/alfresco-aos-module/${AOS_MODULE_VERSION}/alfresco-aos-module-${AOS_MODULE_VERSION}.amp \
+    -o alfresco-aos-module-${AOS_MODULE_VERSION}.amp
+
+WORKDIR /usr/local/tomcat
+RUN set -x && \
+    java -jar /root/alfresco-mmt.jar install /root/amp/ webapps/alfresco -nobackup -directory && \
+    rm /root/amp/alfresco-aos-module-${AOS_MODULE_VERSION}.amp
+
+
+# Deploy Alfresco Google docs in Tomcat
+WORKDIR /root/amp/
+RUN curl ${REPO}/org/alfresco/integration/alfresco-googledocs-repo/${GOOGLE_DOCS_VERSION}/alfresco-googledocs-repo-${GOOGLE_DOCS_VERSION}.amp \
+    -o alfresco-googledocs-repo-${GOOGLE_DOCS_VERSION}.amp
+
+WORKDIR /usr/local/tomcat
+RUN set -x && \
+    java -jar /root/alfresco-mmt.jar install /root/amp/ webapps/alfresco -nobackup -directory && \
+    rm /root/amp/alfresco-googledocs-repo-${GOOGLE_DOCS_VERSION}.amp
 
 
 # Add PostgreSQL driver to Tomcat
