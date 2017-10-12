@@ -1,9 +1,14 @@
 env:
   global:
-  # Docker Repository
-  - REPO=fjudith/alfresco
+  # Docker REGsitory
+  - REG=fjudith/alfresco
   # Compute docker tag
   - TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
+  - REPO=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "repository"; else echo ${TRAVIS_BRANCH}-repository ; fi`
+  - OOO=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "libreoffice"; else echo ${TRAVIS_BRANCH}-libreoffice ; fi`
+  - SEARCH=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "search"; else echo ${TRAVIS_BRANCH}-search ; fi`
+  - SHA=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "share"; else echo ${TRAVIS_BRANCH}-share ; fi`
+
   # Retreive commit ID
   - COMMIT=${TRAVIS_COMMIT::8}
   - secure: "tcOxBQmzMIZJ88rOpIkf1B8x2mNszUUq3I4ebeubx1iRgVjktpbVxf9hT0DKeF/bfEmC9BOxTLHEGdjrnzZ1pVV+EAkBgX12coMHxC2FGbCR5cyrdoSVHVUrg1KAyra92bWVgD0AqWpXIncgfwi4kgatScO8066YdUShna/PPi59YMhxhhQfg8ij6Qch/srf2m03i8Sxpk/MZhNMwMFBkS1CBq4KYGUR8yMFE7iCTo5c6e/4a4DGLxSP4G6+M4WTLf2ayMbl4/QNCQ2h2NWgkrqxmeMfadYGEhLsIQgqozdHl2N5JrPeFyYsJ0L4O9s8Qlt01EX+WYEylVfHhbU4ReoPhILd0ptAiYIFib+5KdNvAsr2z7xWybsgVrc3AomXRUoxT59AtpNJKOSIWRWeRW+aLRpkY3vsXDHkE2GQCrNV3K4CZU5Jd7uFue7q6Fu7BmQdBKhOf35R+Ktqj3ouuLjIbYG1bg0iKczhyxJmbw84jR5yrDoIEXTgSEogxx2YVmlGWhvSDziv6EM0PfCyS4IOxRQ4sBMLvgIxOm+agAsvU3s1O4Bw2UtdYo/i7bV7/DrwLo51uDQVkgllPZAxBJgiv+yfdc35yb6duo99pgM5BAISCIYv+4IcDBsIKnqNOAMhCwAd8hIgbGgN12JC2LCY1RXpph0OyFaKe5LH69Q="
@@ -17,9 +22,15 @@ services:
 
 
 before_install:
-  - docker build -f slim/Dockerfile -t $REPO:$COMMIT slim/
+  # Build Alfresco micro-services
+  - docker build -f repository/Dockerfile -t ${REG}:${COMMIT}-repository repository/
+  - docker build -f libreoffice/Dockerfile -t ${REG}:${COMMIT}-libreoffice libreoffice/
+  - docker build -f search/Dockerfile -t ${REG}:${COMMIT}-search search/
+  - docker build -f share/Dockerfile -t ${REG}:${COMMIT}-share share/
+  # Build Alfresco slim
+  - docker build -f slim/Dockerfile -t $REG:$COMMIT slim/
   - docker run --name 'mysql' -d -p 32731:3306 -e MYSQL_ROOT_PASSWORD=secret -e MYSQL_DATABASE=alfresco -e MYSQL_USER=alfresco -e MYSQL_PASSWORD=secret mysql --character-set-server=utf8 --collation-server=utf8_general_ci --max_connections=1024
-  - docker run --name 'alfresco' -d -p 32732:8080 --link mysql:mysql $REPO:$COMMIT
+  - docker run --name 'alfresco' -d -p 32732:8080 --link mysql:mysql $REG:$COMMIT
   - docker ps -a
 
 
@@ -35,6 +46,14 @@ script:
 
 after_success:
   - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-  - docker tag $REPO:$COMMIT $REPO:$TAG
-  - docker tag $REPO:$COMMIT $REPO:travis-$TRAVIS_BUILD_NUMBER
-  - docker push $REPO:$TAG
+  - docker tag ${REG}:${COMMIT}-repository ${REG}:${REPO}
+  - docker tag ${REG}:${COMMIT}-repository ${REG}:travis-${TRAVIS_BUILD_NUMBER}-repository
+  - docker tag ${REG}:${COMMIT}-libreoffice ${REG}:${OOO}
+  - docker tag ${REG}:${COMMIT}-libreoffice ${REG}:travis-${TRAVIS_BUILD_NUMBER}-libreoffice
+  - docker tag ${REG}:${COMMIT}-search ${REG}:${SEARCH}
+  - docker tag ${REG}:${COMMIT}-search ${REG}:travis-${TRAVIS_BUILD_NUMBER}-search
+  - docker tag ${REG}:${COMMIT}-share ${REG}:${SHA}
+  - docker tag ${REG}:${COMMIT}-share ${REG}:travis-${TRAVIS_BUILD_NUMBER}-share
+  - docker tag ${REG}:${COMMIT} ${REG}:${TAG}
+  - docker tag ${REG}:{$COMMIT} ${REG}:travis-${TRAVIS_BUILD_NUMBER}
+  - docker push $REG
