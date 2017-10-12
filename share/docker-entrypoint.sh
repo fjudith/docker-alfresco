@@ -1,5 +1,5 @@
 #!/bin/bash
-ALFRESCO_HOST=${ALFRESCO_HOST:-platform}
+ALFRESCO_HOST=${ALFRESCO_HOST:-repository}
 
 xmlstarlet ed  \
     -P -S -L \

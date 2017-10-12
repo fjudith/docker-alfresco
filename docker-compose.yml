@@ -18,7 +18,7 @@ services:
     image: fjudith/alfresco:search
     ports:
       - "8983:8983"
-  platform:
+  repository:
     environment:
       DB_HOST: postgres
       DB_KIND: postgresql
@@ -33,8 +33,8 @@ services:
       #LDAP_SECURITY_PRINCIPAL: uid=admin,cn=users,cn=accounts,dc=example,dc=com
       #LDAP_URL: ldap://ipa.example.com:389
       #LDAP_USER_SEARCHBASE: cn=users,cn=accounts,dc=example,dc=com
-    build: platform/
-    image: fjudith/alfresco:platform
+    build: repository/
+    image: fjudith/alfresco:repository
     links:
       - postgresql:postgres
       - libreoffice:libreoffice
@@ -55,4 +55,4 @@ services:
     ports:
       - "8080:8080"
     links:
-      - platform:platform
+      - repository:repository
