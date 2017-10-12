@@ -22,7 +22,7 @@ ENV MYSQL_CONNECTOR_VERSION='5.1.38'
 ENV MD_PREVIEW_VERSION='1.3.0'
 ENV AOS_MODULE_VERSION='1.1.6'
 ENV AIKAU_VERSION='1.0.102'
-ENV GOOGLE_DOCS_VERSION='2.0.4-11'
+ENV GOOGLE_DOCS_VERSION='3.0.4.2'
 
 RUN set -x && \
     apt-get update && \
@@ -83,7 +83,7 @@ RUN set -x && \
 
 # Deploy Alfresco Google docs in Tomcat
 WORKDIR /root/amp/
-RUN curl ${REPO}/org/alfresco/integration/alfresco-googledocs-repo/${GOOGLE_DOCS_VERSION}/alfresco-googledocs-repo-${GOOGLE_DOCS_VERSION}.amp \
+RUN curl ${REPO}/org/alfresco/integrations/alfresco-googledocs-repo/${GOOGLE_DOCS_VERSION}/alfresco-googledocs-repo-${GOOGLE_DOCS_VERSION}.amp \
     -o alfresco-googledocs-repo-${GOOGLE_DOCS_VERSION}.amp
 
 WORKDIR /usr/local/tomcat

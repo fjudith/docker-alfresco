@@ -15,7 +15,7 @@ ENV ALFRESCO_SHARE_VERSION='5.2.f'
 ENV REPO_SHARE_EXTRA="https://artifacts.alfresco.com/nexus/service/local/repositories/share-extras/content"
 ENV ALFRESCO_OAUTH_VERSION='2.3.0'
 ENV AIKAU_VERSION='1.0.102'
-ENV GOOGLE_DOCS_VERSION='2.0.4-11'
+ENV GOOGLE_DOCS_VERSION='3.0.4.2'
 
 RUN set -x && \
     apt-get update && \
@@ -52,7 +52,7 @@ RUN curl ${REPO}/org/alfresco/aikau/${AIKAU_VERSION}/aikau-${AIKAU_VERSION}.jar 
 
 # Deploy Alfresco Google docs in Tomcat
 WORKDIR /root/amp/
-RUN curl ${REPO}/org/alfresco/integration/alfresco-googledocs-share/${GOOGLE_DOCS_VERSION}/alfresco-googledocs-share-${GOOGLE_DOCS_VERSION}.amp \
+RUN curl ${REPO}/org/alfresco/integrations/alfresco-googledocs-share/${GOOGLE_DOCS_VERSION}/alfresco-googledocs-share-${GOOGLE_DOCS_VERSION}.amp \
     -o alfresco-googledocs-share-${GOOGLE_DOCS_VERSION}.amp
 
 WORKDIR /usr/local/tomcat
