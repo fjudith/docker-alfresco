@@ -7,12 +7,7 @@ Alfresco Content Repository
 
 # Supported tags and respective Dockerfile links
 
-[`201707`, `slim`, `latest`](https://github.com/fjudith/docker-alfresco/tree/201707)
-[`201704`](https://github.com/fjudith/docker-alfresco/tree/201704)
-[`201702`](https://github.com/fjudith/docker-alfresco/tree/201702)
-[`201701`](https://github.com/fjudith/docker-alfresco/tree/201701)
-[`201612`](https://github.com/fjudith/docker-alfresco/tree/201612)
-[`201605`](https://github.com/fjudith/docker-alfresco/tree/201605)
+[`201707-repository`, `repository`](https://github.com/fjudith/docker-alfresco/tree/201707)
 
 ## Description
 

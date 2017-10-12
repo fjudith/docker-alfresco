@@ -1,4 +1,4 @@
-Alfresco Share
+Alfresco Search Service
 ===
 [![](https://images.microbadger.com/badges/image/fjudith/alfresco.svg)](https://microbadger.com/images/fjudith/alfresco "Get your own image badge on microbadger.com")
 [![Build Status](https://travis-ci.org/fjudith/docker-alfresco.svg?branch=master)](https://travis-ci.org/fjudith/docker-alfresco)
@@ -13,11 +13,4 @@ Alfresco Share
 
 Alfresco is a leading and modular Enterprise Content Management system providing document management, collaboration, web content services and record management.
 
-This image is aims to run the Web UI component **Alfresco Share** as decated container to consume the **Alfresco Content Repository**.
-
-## Environment variables
-
-| Name                | Description                                | Default  |
-| ------------------- | ------------------------------------------ | -------- |
-| `ALFRESCO_HOST`     | hostname of the alfresco platform instance | platform |
-| `REVERSE_PROXY_URL` | url of the reverse-proxy                   | _empty_  |
+This image is aims to run the Search Engine component **Alfresco Search Services (solr6)** as decated container to be consumed by the **Alfresco Content Repository**.
