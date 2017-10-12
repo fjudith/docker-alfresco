@@ -82,9 +82,22 @@ COPY assets/index.jsp /usr/local/tomcat/webapps/ROOT/
 
 RUN xmlstarlet ed \
     -P -S -L \
-    -i '/Server/Service[@name="Catalina"]/Connector[@port="8080"]' -t 'attr' -n 'URIEncoding' -v 'UTF-8' \
-    -i '/Server/Service[@name="Catalina"]/Connector[@port="8080"]' -t 'attr' -n 'maxHttpHeaderSize' -v '32768' \
-    conf/server.xml
+    -i '/Server/Service[@name="Catalina"]/Connector[@port="8080"]' \
+    -t 'attr' -n 'URIEncoding' -v 'UTF-8' \
+    -i '/Server/Service[@name="Catalina"]/Connector[@port="8080"]' \
+    -t 'attr' -n 'maxHttpHeaderSize' -v '32768' \
+    -s '/Server/Service/Engine/Host[@name="localhost"]' -t 'elem' -n 'abc' \
+    -i '/Server/Service/Engine/Host[@name="localhost"]/abc' \
+    -t 'attr' -n 'className' -v 'org.apache.catalina.valves.RemoteIpValve' \
+    -s '/Server/Service/Engine/Host[@name="localhost"]/abc' \
+    -t 'attr' -n 'remoteIpHeader' -v 'x-forwarded-for' \
+    -i '/Server/Service/Engine/Host[@name="localhost"]/abc' \
+    -t 'attr' -n 'remoteIpProxiesHeader' -v 'x-forwarded-by' \
+    -i '/Server/Service/Engine/Host[@name="localhost"]/abc' \
+    -t 'attr' -n 'protocolHeader' -v 'x-forwarded-proto' \
+    -r '/Server/Service/Engine/Host[@name="localhost"]/abc' \
+    -v 'Valve' \
+    conf/server.xml && cat conf/server.xml
 
 RUN sed -i 's#^\(shared.loader=\).*$#\1${catalina.base}/shared/classes,${catalina.base}/shared/lib/*.jar#g' conf/catalina.properties
 
