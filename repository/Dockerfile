@@ -176,7 +176,7 @@ RUN apt-get clean && \
 
 WORKDIR ${CATALINA_HOME}
 
-VOLUME "/opt/alf_data/"
+VOLUME "/var/lib/alfresco/alf_data"
 
 COPY docker-entrypoint.sh /
 RUN chmod +x /docker-entrypoint.sh
