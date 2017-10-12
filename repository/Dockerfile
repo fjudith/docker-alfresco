@@ -172,14 +172,9 @@ RUN sed -i 's#^\(handlers = \).*$#\11catalina.org.apache.juli.FileHandler, 2loca
 # Cleanup
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/*
-#COPY assets/catalina.properties conf/catalina.properties
-#COPY assets/server.xml conf/server.xml
-#COPY assets/logging.properties conf/logging.properties
-#COPY assets/web.xml webapps/alfresco/WEB-INF/web.xml
-#COPY assets/alfresco-global.properties webapps/alfresco/WEB-INF/classes/alfresco-global.properties
+
 
 WORKDIR ${CATALINA_HOME}
-#WORKDIR /root
 
 VOLUME "/opt/alf_data/"
 
