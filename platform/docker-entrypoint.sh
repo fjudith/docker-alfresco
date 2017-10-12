@@ -136,6 +136,7 @@ SOLR_PORT_SSL=${SOLR_PORT_SSL:-'8443'}
 SOLR_MAX_TOTAL=${$SOLR_MAX_TOTAL:-'40'}
 SOLR_MAX_HOSTS=${$SOLR_MAX_HOSTS:-'40'}
 SOLR_SECURECOMMS=${SOLR_SECURECOMMS:-'none'}
+SOLR_BASE_URL=${SOLR_BASE_URL:-'/solr'}
 
 function cfg_replace_option {
   grep "$1" "$3" > /dev/null
@@ -189,6 +190,7 @@ function tweak_alfresco {
   cfg_replace_option solr.max.total.connections $SOLR_MAX_TOTAL $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option solr.max.host.connections $SOLR_MAX_HOSTS $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option solr.secureComms $SOLR_SECURECOMMS $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option solr.baseUrl $SOLR_BASE_URL $ALFRESCO_GLOBAL_PROPERTIES
 
   # @see https://forums.alfresco.com/en/viewtopic.php?f=8&t=20893
   # CIFS works, but you have to login as a native Alfresco account, like admin

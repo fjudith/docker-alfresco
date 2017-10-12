@@ -9,7 +9,7 @@ JAVA_OPTS_XMX=${JAVA_OPTS_XMX:-512}
 trap '/usr/share/alfresco-search-services/solr/bin/solr stop;exit 0' SIGTERM
 set -ex
 
-#  checking if /usr/share/alfresco-search-services/solrhome/alfresco
+#  Dry run for directory generation
 if [ ! -d /usr/share/alfresco-search-services/solrhome/alfresco ]; then
    /usr/share/alfresco-search-services/solr/bin/solr start -force -a "-Dcreate.alfresco.defaults=alfresco,archive"
    sync
