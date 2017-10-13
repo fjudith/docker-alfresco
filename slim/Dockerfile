@@ -40,6 +40,7 @@ RUN set -x && \
 ADD http://dl.alfresco.com/release/community/${ALF_BUILD}/${ALF_BIN} /tmp/
 RUN mkdir -p ${ALF_HOME} && \
     cd /tmp && \
+    sync && \
     chmod +x ${ALF_BIN} && \
     ./${ALF_BIN} --mode unattended --prefix ${ALF_HOME} --alfresco_admin_password admin && \
     rm ${ALF_BIN}
