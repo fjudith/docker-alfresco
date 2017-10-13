@@ -140,6 +140,14 @@ RUN set -x && \
            webapps/host-manager
 
 
+# this is for LDAP configuration
+WORKDIR ${CATALINA_HOME}
+RUN mkdir -p shared/classes/alfresco/extension/subsystems/Authentication/ldap/ldap1/
+RUN mkdir -p shared/classes/alfresco/extension/subsystems/Authentication/ldap-ad/ldap1/
+COPY assets/ldap-authentication.properties shared/classes/alfresco/extension/subsystems/Authentication/ldap/ldap1/ldap-authentication.properties
+COPY assets/ldap-ad-authentication.properties shared/classes/alfresco/extension/subsystems/Authentication/ldap-ad/ldap1/ldap-ad-authentication.properties
+
+
 # Tuning
 WORKDIR ${CATALINA_HOME}
 RUN xmlstarlet ed \
