@@ -1,4 +1,12 @@
 version: '2'
+volumes:
+  alfresco-db:
+  alfresco-search-cores-alfresco:
+  alfresco-search-cores-archive:
+  alfresco-search-contentstore:
+  alfresco-data:
+  alfresco-logs:
+
 services:
   postgresql:
     environment:
@@ -7,17 +15,24 @@ services:
       POSTGRES_USER: alfresco
     image: postgres:9.4
     volumes:
-      - /var/lib/postgresql/data
+      - alfresco-db:/var/lib/postgresql/data
+  
   libreoffice:
     build: libreoffice/
     image: fjudith/alfresco:libreoffice
     ports:
       - "8100:8100"
+  
   search:
     build: search/
     image: fjudith/alfresco:search
     ports:
       - "8983:8983"
+    volumes:
+      - alfresco-search-cores-alfresco:/usr/share/alfresco-search-services/solrhome/alfresco
+      - alfresco-search-cores-archive:/usr/share/alfresco-search-services/solrhome/archive
+      - alfresco-search-contentstore:/usr/share/alfresco-search-services/contentstore
+  
   repository:
     environment:
       DB_HOST: postgres
@@ -47,8 +62,10 @@ services:
       - "445:445"
       - "8009:8009"
     volumes:
-      - /alfresco/alf_data
-      - /alfresco/tomcat/logs
+    volumes:
+      - alfresco-data:/var/lib/alfresco/alf_data
+      - alfresco-logs:/usr/share/tomcat/logs
+  
   share:
     build: share/
     image: fjudith/alfresco:share

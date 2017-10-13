@@ -1,17 +1,18 @@
 #!/bin/bash
 # http://docs.alfresco.com/5.2/concepts/external-properties-solr6.html
+# https://community.alfresco.com/docs/DOC-6556-using-solr-6-in-alfresco-community-edition-52-201612-ga
 
 ALFRESCO_HOST=${ALFRESCO_HOST:-'repository'}
 SOLR6_INSTALL_LOCATION=${SOLR6_INSTALL_LOCATION:-'/usr/share/alfresco-search-services'}
 SOLR_SOLR_HOST=${SOLR_SOLR_HOST:-'localhost'}
 SOLR_SOLR_PORT=${SOLR_SOLR_PORT:-'8983'}
 SOLR_SOLR_BASEURL=${SOLR_SOLR_BASEURL:-'/solr'}
-SOLR_SOLR_CONTENT_DIR=${SOLR_SOLR_CONTENT_DIR:-"/var/lib/contentstore"}
-SOLR_SOLR_MODEL_DIR=${SOLR_SOLR_MODEL_DIR:-"/var/lib/solrhome/alfrescoModel"}
-SOLR_SOLR_CORES=${SOLR_SOLR_CORES:-"${SOLR6_INSTALL_LOCATION}/solrhome"}
+SOLR_SOLR_CONTENT_DIR=${SOLR_SOLR_CONTENT_DIR:-"${SOLR6_INSTALL_LOCATION}/contentstore"}
+SOLR_SOLR_MODEL_DIR=${SOLR_SOLR_MODEL_DIR:-"${SOLR6_INSTALL_LOCATION}/solrhome/alfrescoModel"}
+SOLR_HOME=${SOLR_HOME:-"${SOLR6_INSTALL_LOCATION}/solrhome"}
 SOLR_JAVA_MEM=${SOLR_JAVA_MEM:-"-Xms1024m -Xmx1024m"}
 
-mkdir -p ${SOLR_SOLR_CONTENT_DIR} ${SOLR_SOLR_MODEL_DIR}
+mkdir -p ${SOLR_SOLR_SOLR_CONTENT_DIR} ${SOLR_SOLR_SOLR_MODEL_DIR}
 
 function cfg_replace_option {
   grep -e "^$1" "$3" > /dev/null
@@ -36,22 +37,27 @@ cfg_replace_option SOLR_SOLR_PORT "\"${SOLR_SOLR_PORT}\"" /usr/share/alfresco-se
 cfg_replace_option SOLR_SOLR_BASEURL "\"${SOLR_SOLR_BASEURL}\"" /usr/share/alfresco-search-services/solr.in.sh
 cfg_replace_option SOLR_SOLR_CONTENT_DIR "\"${SOLR_SOLR_CONTENT_DIR}\"" /usr/share/alfresco-search-services/solr.in.sh
 cfg_replace_option SOLR_SOLR_MODEL_DIR "\"${SOLR_SOLR_MODEL_DIR}\"" /usr/share/alfresco-search-services/solr.in.sh
+cfg_replace_option SOLR_HOME "\"${SOLR_HOME}\"" /usr/share/alfresco-search-services/solr.in.sh
 
 # trap SIGTERM and gracefully stops search service
 trap '/usr/share/alfresco-search-services/solr/bin/solr stop;exit 0' SIGTERM
 set -ex
 
 # Create alfresco and archive cores 
-if [ ! -d ${SOLR_SOLR_CORES}/alfresco ]; then   
+if [ ! -f ${SOLR_HOME}/alfresco/core.properties ]; then   
     /usr/share/alfresco-search-services/solr/bin/solr start -force -a "-Dcreate.alfresco.defaults=alfresco,archive"
     sync
     sleep 20
     sync;
     /usr/share/alfresco-search-services/solr/bin/solr stop
 
-    # Update "alfresco" and "archive" core config files
-    cfg_replace_option alfresco.host ${ALFRESCO_HOST} ${SOLR_SOLR_CORES}/alfresco/conf/solrcore.properties
-    cfg_replace_option alfresco.host ${ALFRESCO_HOST} ${SOLR_SOLR_CORES}/archive/conf/solrcore.properties
+    # Update "alfresco" core config files
+    cfg_replace_option alfresco.host ${ALFRESCO_HOST} ${SOLR_HOME}/alfresco/conf/solrcore.properties
+    cfg_replace_option data.dir.root ${SOLR_HOME} ${SOLR_HOME}/alfresco/conf/solrcore.properties
+
+    # Update "archive" core config files
+    cfg_replace_option alfresco.host ${ALFRESCO_HOST} ${SOLR_HOME}/archive/conf/solrcore.properties
+    cfg_replace_option data.dir.root ${SOLR_HOME} ${SOLR_HOME}/archive/conf/solrcore.properties
 fi
 
 # starting the server

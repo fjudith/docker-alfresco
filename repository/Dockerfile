@@ -88,12 +88,12 @@ RUN set -x && \
 
 # Deploy Alfresco md-preview in Tomcat
 WORKDIR /root/amp/
-RUN curl https://github.com/fjudith/md-preview/releases/download/${MD_PREVIEW_VERSION}/parashift-mdpreview-repo-${MD_PREVIEW_VERSION}.amp \
+RUN curl -L https://github.com/fjudith/md-preview/releases/download/${MD_PREVIEW_VERSION}/parashift-mdpreview-repo-${MD_PREVIEW_VERSION}.amp \
     -o parashift-mdpreview-repo-${MD_PREVIEW_VERSION}.amp
 
 WORKDIR ${CATALINA_HOME}
 RUN set -x && \
-    java -jar /root/alfresco-mmt.jar install /root/amp/parashift-mdpreview-repo-${MD_PREVIEW_VERSION}.amp webapps/alfresco -nobackup -directory && \
+    java -jar /root/alfresco-mmt.jar install /root/amp/ webapps/alfresco/ -nobackup -verbose -directory && \
     rm /root/amp/parashift-mdpreview-repo-${MD_PREVIEW_VERSION}.amp
 
 
