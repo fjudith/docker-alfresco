@@ -85,22 +85,23 @@ WORKDIR ${CATALINA_HOME}
 COPY assets/share-custom-config.xml shared/classes/alfresco/web-extension/share-config-custom.xml
 COPY assets/index.jsp ${CATALINA_HOME}/webapps/ROOT/
 
-RUN xmlstarlet ed \
+RUN UUID=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1) && \
+    xmlstarlet ed \
     -P -S -L \
     -i '/Server/Service[@name="Catalina"]/Connector[@port="8080"]' \
     -t 'attr' -n 'URIEncoding' -v 'UTF-8' \
     -i '/Server/Service[@name="Catalina"]/Connector[@port="8080"]' \
     -t 'attr' -n 'maxHttpHeaderSize' -v '32768' \
-    -s '/Server/Service/Engine/Host[@name="localhost"]' -t 'elem' -n 'abc' \
-    -i '/Server/Service/Engine/Host[@name="localhost"]/abc' \
+    -s '/Server/Service/Engine/Host[@name="localhost"]' -t 'elem' -n "${UUID}" \
+    -i "/Server/Service/Engine/Host[@name='localhost']/${UUID}" \
     -t 'attr' -n 'className' -v 'org.apache.catalina.valves.RemoteIpValve' \
-    -s '/Server/Service/Engine/Host[@name="localhost"]/abc' \
+    -s "/Server/Service/Engine/Host[@name='localhost']/${UUID}" \
     -t 'attr' -n 'remoteIpHeader' -v 'x-forwarded-for' \
-    -i '/Server/Service/Engine/Host[@name="localhost"]/abc' \
+    -i "/Server/Service/Engine/Host[@name='localhost']/${UUID}" \
     -t 'attr' -n 'remoteIpProxiesHeader' -v 'x-forwarded-by' \
-    -i '/Server/Service/Engine/Host[@name="localhost"]/abc' \
+    -i "/Server/Service/Engine/Host[@name='localhost']/${UUID}" \
     -t 'attr' -n 'protocolHeader' -v 'x-forwarded-proto' \
-    -r '/Server/Service/Engine/Host[@name="localhost"]/abc' \
+    -r "/Server/Service/Engine/Host[@name='localhost']/${UUID}" \
     -v 'Valve' \
     conf/server.xml && cat conf/server.xml
 
