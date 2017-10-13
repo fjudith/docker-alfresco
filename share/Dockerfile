@@ -22,6 +22,7 @@ RUN set -x && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
         dnsutils \
+        netcat \
         xmlstarlet
 
 

@@ -21,6 +21,7 @@ RUN useradd -ms /bin/bash libreoffice
 RUN apt-get update -yqq && \
     apt-get install -yqq --no-install-recommends \
         dnsutils \
+        netcat \
         curl \
         fontconfig \
         libsm6 \

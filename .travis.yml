@@ -22,11 +22,7 @@ services:
 
 before_install:
   # Build Alfresco micro-services
-  - docker build -f repository/Dockerfile -t ${REG}:${COMMIT}-repository repository/
-  - docker build -f libreoffice/Dockerfile -t ${REG}:${COMMIT}-libreoffice libreoffice/
-  - docker build -f search/Dockerfile -t ${REG}:${COMMIT}-search search/
-  - docker build -f share/Dockerfile -t ${REG}:${COMMIT}-share share/
-  - docker-compose up -d
+  - docker-compose up --build -d
   # Build Alfresco slim
   - docker build -f slim/Dockerfile -t ${REG}:${COMMIT} slim/
   - docker run --name 'mysql' -d -p 32731:3306 -e MYSQL_ROOT_PASSWORD=secret -e MYSQL_DATABASE=alfresco -e MYSQL_USER=alfresco -e MYSQL_PASSWORD=secret mysql --character-set-server=utf8 --collation-server=utf8_general_ci --max_connections=1024
@@ -46,9 +42,16 @@ script:
   # -X, --request – specify request  COMMAND (GET, PUT, DELETE…)  to use
   - docker exec ${DOCKER_ALF} /bin/bash -c "curl -i -X GET -u admin:admin http://localhost:8080/alfresco/service/api/audit/control"
   - docker exec ${DOCKER_REPO} /bin/bash -c "curl -i -X GET -u admin:admin http://localhost:8080/alfresco/service/api/audit/control"
-  - docker exec ${DOCKER_OOO} /bin/bash -c "curl -v telnet://localhost:8100"
+  - docker exec ${DOCKER_OOO} /bin/bash -c "nc -zv -w 5 localhost 8100"
   - docker exec ${DOCKER_SEARCH} /bin/bash -c "curl -i -X GET http://localhost:8389/solr/admin/cores"
   - docker exec ${DOCKER_SHA} /bin/bash -c "curl -i -X GET http://localhost:8080/share/page"
+  # Container inter-networking test
+  - docker exec ${DOCKER_REPO} /bin/bash -c "curl -i -X GET -u http://${DOCKER_SEARCH}:8389/solr/admin/cores"
+  - docker exec ${DOCKER_REPO} /bin/bash -c "curl -i -X GET -u "nc -zv -w 5 ${DOCKER_OOO} 8100"
+  - docker exec ${DOCKER_SEARCH} /bin/bash -c "curl -i -X GET -u admin:admin http://${DOCKER_REPO}:8080/alfresco/service/api/audit/control"
+  - docker exec ${DOCKER_SHA} /bin/bash -c "curl -i -X GET -u admin:admin http://${DOCKER_REPO}:8080/alfresco/service/api/audit/control"
+  - curl -i -X GET http://localhost:8080/share/page
+
 
 
 after_success:

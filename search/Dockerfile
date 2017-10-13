@@ -16,6 +16,7 @@ RUN set -x && \
     apt-get update -yqq && \
     apt-get install --no-install-recommends -yqq \
         dnsutils \
+        netcat \
         supervisor \
         curl \
         procps \
