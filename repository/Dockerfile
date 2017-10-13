@@ -29,7 +29,6 @@ RUN set -x && \
         dnsutils \
         netcat \
         imagemagick \
-        ghostscript \
         xmlstarlet
 
 # Download Alfresco Module Management
