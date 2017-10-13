@@ -37,10 +37,10 @@ before_install:
 script:
   # Wait for alfresco to start
   - sleep 300
-  - DOCKER_REPO=`docker ps -qa -f ancestor=${REG}:${COMMIT}-repository`
-  - DOCKER_OOO=`docker ps -qa -f ancestor=${REG}:${COMMIT}-libreoffice`
-  - DOCKER_SEARCH=`docker ps -qa -f ancestor=${REG}:${COMMIT}-search`
-  - DOCKER_SHA=`docker ps -qa -f ancestor=${REG}:${COMMIT}-share`
+  - DOCKER_REPO=`docker ps -qa -f ancestor=${REG}:repository`
+  - DOCKER_OOO=`docker ps -qa -f ancestor=${REG}:libreoffice`
+  - DOCKER_SEARCH=`docker ps -qa -f ancestor=${REG}:search`
+  - DOCKER_SHA=`docker ps -qa -f ancestor=${REG}:share`
   - DOCKER_ALF=`docker ps -qa -f ancestor=${REG}:${COMMIT}`
   # -i, --include – include protocol headers in the output (H/F)
   # -X, --request – specify request  COMMAND (GET, PUT, DELETE…)  to use
