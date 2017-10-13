@@ -12,6 +12,7 @@ ENV CONNECTOR=mysql-connector-java-5.1.38
 ENV ALF_HOME=/alfresco
 ENV ALF_BUILD=201707-build-00028
 ENV ALF_BIN=alfresco-community-installer-201707-linux-x64.bin
+ENV MD_PREVIEW_VERSION=1.3.0
 
 RUN set -x && \
     apt-get update -yqq && \
@@ -42,6 +43,7 @@ RUN mkdir -p ${ALF_HOME} && \
     cd /tmp && \
     sync && \
     chmod +x ${ALF_BIN} && \
+    sync && \
     ./${ALF_BIN} --mode unattended --prefix ${ALF_HOME} --alfresco_admin_password admin && \
     rm ${ALF_BIN}
 
@@ -66,9 +68,10 @@ COPY assets/ldap-ad-authentication.properties /alfresco/tomcat/shared/classes/al
 
 # Copy Markdown Preview Add-On.
 # https://github.com/cetra3/md-preview
-ADD https://github.com/fjudith/md-preview/releases/download/1.3.0/parashift-mdpreview-share-1.3.0.amp /alfresco/amps_share/
-ADD https://github.com/fjudith/md-preview/releases/download/1.3.0/parashift-mdpreview-repo-1.3.0.amp /alfresco/amps/
-
+RUN curl https://github.com/fjudith/md-preview/releases/download/${MD_PREVIEW_VERSION}/parashift-mdpreview-share-${MD_PREVIEW_VERSION}.amp \
+    -o /alfresco/amps_share/parashift-mdpreview-share-${MD_PREVIEW_VERSION}.amp
+RUN curl https://github.com/fjudith/md-preview/releases/download/${MD_PREVIEW_VERSION}/parashift-mdpreview-repo-${MD_PREVIEW_VERSION}.amp \
+    -o /alfresco/amps/parashift-mdpreview-repo-${MD_PREVIEW_VERSION}.amp
 
 # install scripts
 COPY docker-entrypoint.sh /alfresco/
