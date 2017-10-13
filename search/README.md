@@ -7,7 +7,7 @@ Alfresco Search Service
 
 # Supported tags and respective Dockerfile links
 
-[`201707-repository`, `repository`](https://github.com/fjudith/docker-alfresco/tree/201707)
+[`201707-search`, `search`](https://github.com/fjudith/docker-alfresco/tree/201707/search)
 
 ## Description
 
