@@ -50,8 +50,8 @@ script:
   - docker exec ${DOCKER_REPO} /bin/bash -c "nc -zv -w 5 ${DOCKER_OOO} 8100"
   - docker exec ${DOCKER_SEARCH} /bin/bash -c "curl -i -X GET -u admin:admin http://${DOCKER_REPO}:8080/alfresco/service/api/audit/control"
   - docker exec ${DOCKER_SHA} /bin/bash -c "curl -i -X GET -u admin:admin http://${DOCKER_REPO}:8080/alfresco/service/api/audit/control"
-  - curl -iL -u admin:admin -X GET http://localhost:8080/share/page
-  - curl -iL -u admin:admin -X GET http://localhost:32732/share/page
+  - curl -iL -u admin:admin --header http://localhost:8080/share/page
+  - curl -iL -u admin:admin --header http://localhost:32732/share/page
 
 
 
