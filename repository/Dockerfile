@@ -132,7 +132,7 @@ RUN set -x && \
     mkdir -p  shared/classes/alfresco/extension \
               shared/classes/alfresco/messages \
               shared/lib \
-              /var/lib/alf_data && \
+              /var/lib/alfresco/alf_data && \
     rm -rf /usr/share/doc \
            webapps/docs \
            webapps/examples \
