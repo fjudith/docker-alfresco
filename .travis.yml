@@ -46,7 +46,7 @@ script:
   # -X, --request – specify request  COMMAND (GET, PUT, DELETE…)  to use
   - docker exec ${DOCKER_ALF} /bin/bash -c "curl -i -X GET -u admin:admin http://localhost:8080/alfresco/service/api/audit/control"
   - docker exec ${DOCKER_REPO} /bin/bash -c "curl -i -X GET -u admin:admin http://localhost:8080/alfresco/service/api/audit/control"
-  - docker exec ${DOCKER_OOO} /bin/bash -c "curl -i -X GET http://localhost:8100"
+  - docker exec ${DOCKER_OOO} /bin/bash -c "curl -v telnet://localhost:8100"
   - docker exec ${DOCKER_SEARCH} /bin/bash -c "curl -i -X GET http://localhost:8389/solr/admin/cores"
   - docker exec ${DOCKER_SHA} /bin/bash -c "curl -i -X GET http://localhost:8080/share/page"
 
