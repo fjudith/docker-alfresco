@@ -82,12 +82,9 @@ pipeline {
                 }
             }
         }
-    }
-    stages {
         stage ('Alfresco LibreOffice') {
             parallel {
                 stage ('Docker build Micro-Service'){
-                
                     agent { label 'docker'}
                     steps {
                         sh "docker build -f libreoffice/Dockerfile -t ${REPO}:${COMMIT}-libreoffice libreoffice/"
@@ -136,9 +133,6 @@ pipeline {
                     }
                 }
             }
-        }
-    }
-    stages {
         stage ('Run'){
             parallel {
                 stage ('Slim'){
