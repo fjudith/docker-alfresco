@@ -137,6 +137,7 @@ pipeline {
                         // Start database
                         sh "docker run -d --name 'mysql-${BUILD_NUMBER}' -e MYSQL_USER=alfresco -e MYSQL_PASSWORD=alfresco -e MYSQL_DATABASE=alfresco amd64/mysql:5.6"
                         sleep 30
+                        sh "docker logs mysql-${BUILD_NUMBER}"
                         // Start application
                         sh "docker run -d --name 'alfresco-${BUILD_NUMBER}' --link mysql-${BUILD_NUMBER}:mysql ${REPO}:${COMMIT}"
                     }
@@ -161,6 +162,7 @@ pipeline {
                 stage ('Slim'){
                     agent { label 'docker' }
                     steps {
+                        sleep 240
                         // internal
                         sh "docker exec 'alfresco-${BUILD_NUMBER}' /bin/bash -c 'curl -i -X GET -u admin:admin http://localhost:8080/alfresco/service/api/audit/control'"
                         // External
@@ -171,6 +173,7 @@ pipeline {
                 stage ('Micro-Services'){
                     agent { label 'docker'}
                     steps {
+                        sleep 240
                         // Internal
                         sh "docker exec libreoffice-${BUILD_NUMBER} /bin/bash -c 'nc -zv -w 5 localhost 8100'"
                         sh "docker exec search-${BUILD_NUMBER} /bin/bash -c 'curl -i -X GET http://localhost:8983/solr/admin/cores'"
