@@ -82,79 +82,79 @@ pipeline {
                 }
             }
         }
-        stages ('Docker build Micro-Service'){
-            parallel {
-                stage ('Alfresco LibreOffice') {
-                    agent { label 'docker'}
-                    steps {
-                        sh "docker build -f libreoffice/Dockerfile -t ${REPO}:${COMMIT}-libreoffice libreoffice/"
-                    }
-                    post {
-                        success {
-                            echo 'Tag for private registry'
-                            sh "docker tag ${REPO}:${COMMIT}-libreoffice ${PRIVATE_REPO}:${ALF_OOO}"
-                        }
+    }
+    stages ('Docker build Micro-Service'){
+        parallel {
+            stage ('Alfresco LibreOffice') {
+                agent { label 'docker'}
+                steps {
+                    sh "docker build -f libreoffice/Dockerfile -t ${REPO}:${COMMIT}-libreoffice libreoffice/"
+                }
+                post {
+                    success {
+                        echo 'Tag for private registry'
+                        sh "docker tag ${REPO}:${COMMIT}-libreoffice ${PRIVATE_REPO}:${ALF_OOO}"
                     }
                 }
-                stage ('Alfresco Search Services') {
-                    agent { label 'docker'}
-                    steps {
-                        sh "docker build -f search/Dockerfile -t ${REPO}:${COMMIT}-search search/"
-                    }
-                    post {
-                        success {
-                            echo 'Tag for private registry'
-                            sh "docker tag ${REPO}:${COMMIT}-search ${PRIVATE_REPO}:${ALF_SEARCH}"
-                        }
+            }
+            stage ('Alfresco Search Services') {
+                agent { label 'docker'}
+                steps {
+                    sh "docker build -f search/Dockerfile -t ${REPO}:${COMMIT}-search search/"
+                }
+                post {
+                    success {
+                        echo 'Tag for private registry'
+                        sh "docker tag ${REPO}:${COMMIT}-search ${PRIVATE_REPO}:${ALF_SEARCH}"
                     }
                 }
-                stage ('Alfresco Content Repository Services') {
-                    agent { label 'docker'}
-                    steps {
-                        sh "docker build -f repository/Dockerfile -t ${REPO}:${COMMIT}-repository repository/"
-                    }
-                    post {
-                        success {
-                            echo 'Tag for private registry'
-                            sh "docker tag ${REPO}:${COMMIT}-repository ${PRIVATE_REPO}:${ALF_REPO}"
-                        }
+            }
+            stage ('Alfresco Content Repository Services') {
+                agent { label 'docker'}
+                steps {
+                    sh "docker build -f repository/Dockerfile -t ${REPO}:${COMMIT}-repository repository/"
+                }
+                post {
+                    success {
+                        echo 'Tag for private registry'
+                        sh "docker tag ${REPO}:${COMMIT}-repository ${PRIVATE_REPO}:${ALF_REPO}"
                     }
                 }
-                stage ('Alfresco Share') {
-                    agent { label 'docker'}
-                    steps {
-                        sh "docker build -f share/Dockerfile -t ${REPO}:${COMMIT}-share share/"
-                    }
-                    post {
-                        success {
-                            echo 'Tag for private registry'
-                            sh "docker tag ${REPO}:${COMMIT}-share ${PRIVATE_REPO}:${ALF_SHA}"
-                        }
+            }
+            stage ('Alfresco Share') {
+                agent { label 'docker'}
+                steps {
+                    sh "docker build -f share/Dockerfile -t ${REPO}:${COMMIT}-share share/"
+                }
+                post {
+                    success {
+                        echo 'Tag for private registry'
+                        sh "docker tag ${REPO}:${COMMIT}-share ${PRIVATE_REPO}:${ALF_SHA}"
                     }
                 }
             }
         }
-        stage ('Run'){
-            parallel {
-                stage ('Slim'){
-                    agent { label 'docker' }
-                    steps {
-                        // Start database
-                        sh "docker run -d --name 'mysql-${BUILD_NUMBER}' -e MYSQL_USER=alfresco -e MYSQL_PASSWORD=alfresco -e MYSQL_DATABASE=alfresco amd64/mysql:5.6"
-                        // Start application
-                        sh "docker run -d --name 'alfresco-${BUILD_NUMBER}' --link mysql-${BUILD_NUMBER}:mysql ${REPO}:${COMMIT}"
-                    }
+    }
+    stages ('Run'){
+        parallel {
+            stage ('Slim'){
+                agent { label 'docker' }
+                steps {
+                    // Start database
+                    sh "docker run -d --name 'mysql-${BUILD_NUMBER}' -e MYSQL_USER=alfresco -e MYSQL_PASSWORD=alfresco -e MYSQL_DATABASE=alfresco amd64/mysql:5.6"
+                    // Start application
+                    sh "docker run -d --name 'alfresco-${BUILD_NUMBER}' --link mysql-${BUILD_NUMBER}:mysql ${REPO}:${COMMIT}"
                 }
-                stage ('Micro-Services'){
-                    agent { label 'docker'}
-                    steps {
-                        // Start database
-                        sh "docker run -d --name 'postgres-${BUILD_NUMBER}' -e POSTGRES_USER=alfresco -e POSTGRES_PASSWORD=alfresco -e POSTGRES_DB=alfresco amd64/postgres:9.4"
-                        //Start application micro-services
-                        sh "docker run -d --name 'libreoffice-${BUILD_NUMBER}' -p 56082:8100 ${REPO}:${COMMIT}-libreoffice"
-                        sh "docker run -d --name 'search-${BUILD_NUMBER}' -p 56082:8100 ${REPO}:${COMMIT}-search"
-                        sh "docker run -d --name 'repository-${BUILD_NUMBER}' --link postgres-${BUILD_NUMBER}:postgres --link libreoffice-${BUILD_NUMBER}:libreoffice --link search-${BUILD_NUMBER}:search -p 56080:8080 -p 56443:8443 ${REPO}:${COMMIT}-repository"
-                    }
+            }
+            stage ('Micro-Services'){
+                agent { label 'docker'}
+                steps {
+                    // Start database
+                    sh "docker run -d --name 'postgres-${BUILD_NUMBER}' -e POSTGRES_USER=alfresco -e POSTGRES_PASSWORD=alfresco -e POSTGRES_DB=alfresco amd64/postgres:9.4"
+                    //Start application micro-services
+                    sh "docker run -d --name 'libreoffice-${BUILD_NUMBER}' -p 56082:8100 ${REPO}:${COMMIT}-libreoffice"
+                    sh "docker run -d --name 'search-${BUILD_NUMBER}' -p 56082:8100 ${REPO}:${COMMIT}-search"
+                    sh "docker run -d --name 'repository-${BUILD_NUMBER}' --link postgres-${BUILD_NUMBER}:postgres --link libreoffice-${BUILD_NUMBER}:libreoffice --link search-${BUILD_NUMBER}:search -p 56080:8080 -p 56443:8443 ${REPO}:${COMMIT}-repository"
                 }
             }
         }
