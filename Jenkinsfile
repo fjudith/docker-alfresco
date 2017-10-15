@@ -133,6 +133,7 @@ pipeline {
                     }
                 }
             }
+        }
         stage ('Run'){
             parallel {
                 stage ('Slim'){
