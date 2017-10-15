@@ -1,3 +1,4 @@
+// 
 // https://github.com/jenkinsci/pipeline-model-definition-plugin/wiki/Syntax-Reference
 // https://jenkins.io/doc/book/pipeline/syntax/#parallel
 // https://jenkins.io/doc/book/pipeline/syntax/#post
@@ -7,6 +8,7 @@ pipeline {
         REPO = 'fjudith/alfresco'
         PRIVATE_REPO = "${PRIVATE_REGISTRY}/${REPO}"
         DOCKER_PRIVATE = credentials('docker-private-registry')
+        COMMIT=env.GIT_COMMIT.SubString(0,8)
     }
     stages {
         stage ('Checkout') {
