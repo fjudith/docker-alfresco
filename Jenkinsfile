@@ -136,7 +136,7 @@ pipeline {
                     steps {
                         // Start database
                         sh "docker run -d --name 'mysql-${BUILD_NUMBER}' -e MYSQL_ROOT_PASSWORD=alfresco -e MYSQL_USER=alfresco -e MYSQL_PASSWORD=alfresco -e MYSQL_DATABASE=alfresco amd64/mysql:5.6"
-                        sleep 30
+                        sleep 15
                         sh "docker logs mysql-${BUILD_NUMBER}"
                         // Start application
                         sh "docker run -d --name 'alfresco-${BUILD_NUMBER}' --link mysql-${BUILD_NUMBER}:mysql ${REPO}:${COMMIT}"
@@ -147,7 +147,7 @@ pipeline {
                     steps {
                         // Start database
                         sh "docker run -d --name 'postgres-${BUILD_NUMBER}' -e POSTGRES_USER=alfresco -e POSTGRES_PASSWORD=alfresco -e POSTGRES_DB=alfresco amd64/postgres:9.4"
-                        sleep 30
+                        sleep 15
                         //Start application micro-services
                         sh "docker run -d --name 'libreoffice-${BUILD_NUMBER}' ${REPO}:${COMMIT}-libreoffice"
                         sh "docker run -d --name 'search-${BUILD_NUMBER}' ${REPO}:${COMMIT}-search"
