@@ -184,13 +184,13 @@ pipeline {
                         }
                     }
                 }
-            }
-            post {
-                always {
-                    sh 'docker rm -f search-${BUILD_NUMBER}'
-                    sh 'docker rm -f libreoffice-${BUILD_NUMBER}'
-                    sh 'docker rm -f repository-${BUILD_NUMBER}'
-                    sh 'docker rm -f share-${BUILD_NUMBER}'
+                post {
+                    always {
+                        sh 'docker rm -f search-${BUILD_NUMBER}'
+                        sh 'docker rm -f libreoffice-${BUILD_NUMBER}'
+                        sh 'docker rm -f repository-${BUILD_NUMBER}'
+                        sh 'docker rm -f share-${BUILD_NUMBER}'
+                    }
                 }
             }
         }
