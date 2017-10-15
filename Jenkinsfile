@@ -192,7 +192,7 @@ pipeline {
                         sh "docker exec share-${BUILD_NUMBER} /bin/bash -c 'curl -i -X GET -u admin:admin http://localhost:8080/share/page'"
                         // Cross Container
                         sh "docker exec ${DOCKER_REPO} /bin/bash -c 'nc -zv -w 5 ${DOCKER_OOO} 8100'"
-                        sh "docker exec ${DOCKER_REPO} /bin/bash -c 'curl -i -X GET http://${DOCKER_SEARCH}:8983/solr/admin/cores\'"
+                        sh "docker exec ${DOCKER_REPO} /bin/bash -c 'curl -i -X GET http://${DOCKER_SEARCH}:8983/solr/admin/cores'"
                         sh "docker exec ${DOCKER_SEARCH} /bin/bash -c 'curl -i -X GET -u admin:admin http://${DOCKER_REPO}:8080/alfresco/service/api/audit/control'"
                         sh "docker exec ${DOCKER_SHA} /bin/bash -c 'curl -i -X GET -u admin:admin http://${DOCKER_SHA}:8080/alfresco/service/api/audit/control'"
                         // External
