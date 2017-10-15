@@ -18,14 +18,14 @@ pipeline {
                     if ("${BRANCH_NAME}" == "master"){
                         TAG = "latest"
                         ALF_OOO = "libreoffice"
-                        ALF_REPO = "platform"
+                        ALF_REPO = "repository"
                         ALF_SHA = "share"
                         ALF_SEARCH = "search"
                     }
                     else {
                         TAG = "${BRANCH_NAME}"
                         ALF_OOO = "${BRANCH_NAME}-libreoffice"
-                        ALF_REPO = "${BRANCH_NAME}-platform"
+                        ALF_REPO = "${BRANCH_NAME}-repository"
                         ALF_SHA = "${BRANCH_NAME}-share"
                         ALF_SEARCH = "${BRANCH_NAME}-search"                        
                     }
@@ -102,7 +102,7 @@ pipeline {
                         sh "docker ps -a"
                         sleep 300
                         sh "docker logs libreoffice-${BUILD_NUMBER}"
-                        sh 'docker run --rm --link libreoffice-${BUILD_NUMBER}:libreoffice blitznote/debootstrap-amd64:17.04 bash -c "curl -i -X GET -u http://libreoffice:8100"'
+                        sh 'docker exec libreoffice-${BUILD_NUMBER} /bin/bash -c "nc -zv -w 5 localhost 8100"'
                     }
                     post {
                         always {
@@ -126,7 +126,7 @@ pipeline {
                         sh "docker ps -a"
                         sleep 300
                         sh "docker logs search-${BUILD_NUMBER}"
-                        sh 'docker run --rm --link search-${BUILD_NUMBER}:search blitznote/debootstrap-amd64:17.04 bash -c "curl -i -X GET http://search:8983"'
+                        sh 'docker run --rm --link search-${BUILD_NUMBER}:search blitznote/debootstrap-amd64:17.04 bash -c "curl -i -X GET http://search:8983/solr/admin/cores"'
                     }
                     post {
                         always {
@@ -141,28 +141,28 @@ pipeline {
                         }
                     }
                 }
-                stage ('Alfresco Platform Services') {
+                stage ('Alfresco Content Repository Services') {
                     agent { label 'docker'}
                     steps {
                         unstash 'manual-manager'
                         unstash 'md-preview'
                         sh 'tree -sh'
-                        sh "docker build -f platform/Dockerfile -t ${REPO}:${COMMIT}-platform platform/"
+                        sh "docker build -f repository/Dockerfile -t ${REPO}:${COMMIT}-repository repository/"
                         sh "docker run -d --name 'postgres-${BUILD_NUMBER}' -e POSTGRES_USER=alfresco -e POSTGRES_PASSWORD=alfresco -POSTGRES_DB=alfresco amd64/postgres:9.4"
-                        sh "docker run -d --name 'platform-${BUILD_NUMBER}' --link postgres-${BUILD_NUMBER}:postgres --link libreoffice-${BUILD_NUMBER}:libreoffice -p 56080:8080 -p 56443:8443 ${REPO}:${COMMIT}-platform"
+                        sh "docker run -d --name 'repository-${BUILD_NUMBER}' --link postgres-${BUILD_NUMBER}:postgres --link libreoffice-${BUILD_NUMBER}:libreoffice -p 56080:8080 -p 56443:8443 ${REPO}:${COMMIT}-repository"
                         sh "docker ps -a"
                         sleep 300
-                        sh "docker logs platform-${BUILD_NUMBER}"
-                        sh 'docker run --rm --link platform-${BUILD_NUMBER}:platform blitznote/debootstrap-amd64:17.04 bash -c "curl -i -X GET -u admin:admin http://platform:8080/alfresco/service/api/audit/control"'
+                        sh "docker logs repository-${BUILD_NUMBER}"
+                        sh 'docker run --rm --link repository-${BUILD_NUMBER}:repository blitznote/debootstrap-amd64:17.04 bash -c "curl -i -X GET -u admin:admin http://repository:8080/alfresco/service/api/audit/control"'
                     }
                     post {
                         always {
-                           sh 'docker rm -f platform-${BUILD_NUMBER}'
+                           sh 'docker rm -f repository-${BUILD_NUMBER}'
                         }
                         success {
                             echo 'Tag and Push to private registry'
-                            sh "docker tag ${REPO}:${COMMIT}-platform ${REPO}:${ALF_REPO}"
-                            sh "docker tag ${REPO}:${COMMIT}-platform ${PRIVATE_REPO}:${ALF_REPO}"
+                            sh "docker tag ${REPO}:${COMMIT}-repository ${REPO}:${ALF_REPO}"
+                            sh "docker tag ${REPO}:${COMMIT}-repository ${PRIVATE_REPO}:${ALF_REPO}"
                             sh "docker login -u ${DOCKER_PRIVATE_USR} -p ${DOCKER_PRIVATE_PSW} ${PRIVATE_REGISTRY}"
                             sh "docker push ${PRIVATE_REPO}:${ALF_REPO}"
                         }
@@ -175,12 +175,11 @@ pipeline {
                         unstash 'md-preview'
                         sh 'tree -sh'
                         sh "docker build -f share/Dockerfile -t ${REPO}:${COMMIT}-share share/"
-                        sh "docker run -d --name 'postgres-${BUILD_NUMBER}' -e POSTGRES_USER=alfresco -e POSTGRES_PASSWORD=alfresco -POSTGRES_DB=alfresco amd64/postgres:9.4"
-                        sh "docker run -d --name 'share-${BUILD_NUMBER}' --link postgres-${BUILD_NUMBER}:postgres --link libreoffice-${BUILD_NUMBER}:libreoffice -p 56080:8080 -p 56443:8443 ${REPO}:${COMMIT}-share"
+                        sh "docker run -d --name 'share-${BUILD_NUMBER}' --link repository-${BUILD_NUMBER}:repository ${REPO}:${COMMIT}-share"
                         sh "docker ps -a"
                         sleep 300
                         sh "docker logs share-${BUILD_NUMBER}"
-                        sh 'docker run --rm --link platform-${BUILD_NUMBER}:share blitznote/debootstrap-amd64:17.04 bash -c "curl -i -X GET -u admin:admin http://share:8080/alfresco/service/api/audit/control"'
+                        sh 'docker run --rm --link share-${BUILD_NUMBER}:share blitznote/debootstrap-amd64:17.04 bash -c "curl -i -X GET -u admin:admin http://share:8080/share/page"'
                     }
                     post {
                         always {
