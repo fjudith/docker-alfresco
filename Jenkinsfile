@@ -157,6 +157,16 @@ pipeline {
                 }
             }
         }
+        stage ('Get container id') {
+            steps {
+                DOCKER_OOO    = sh("docker ps -qa -f ancestor=${REPO}:${COMMIT}-libreoffice")
+                DOCKER_SEARCH = sh("docker ps -qa -f ancestor=${REPO}:${COMMIT}-search")
+                DOCKER_REPO   = sh("docker ps -qa -f ancestor=${REPO}:${COMMIT}-repository")
+                DOCKER_SHA    = sh("docker ps -qa -f ancestor=${REPO}:${COMMIT}-share")
+                echo ${DOCKER_OOO}
+            }
+        }
+
         stage ('Test'){
             parallel {
                 stage ('Slim'){
