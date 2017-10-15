@@ -38,9 +38,11 @@ RUN set -x && \
 
 
 # Install Alfresco
-ADD http://dl.alfresco.com/release/community/${ALF_BUILD}/${ALF_BIN} /tmp/
+WORKDIR /tmp
+RUN curl -L http://dl.alfresco.com/release/community/${ALF_BUILD}/${ALF_BIN} \
+    -o ${ALF_BIN}
+
 RUN mkdir -p ${ALF_HOME} && \
-    cd /tmp && \
     sync && \
     chmod +x ${ALF_BIN} && \
     sync && \
@@ -48,17 +50,20 @@ RUN mkdir -p ${ALF_HOME} && \
     rm ${ALF_BIN}
 
 # Install MySQL connector for Alfresco
-ADD http://dev.mysql.com/get/Downloads/Connector-J/${CONNECTOR}.tar.gz /tmp/
-RUN cd /tmp && \
-    tar xvzf ${CONNECTOR}.tar.gz ${CONNECTOR}/${CONNECTOR}-bin.jar && \
+WORKDIR /tmp
+RUN curl -L http://dev.mysql.com/get/Downloads/Connector-J/${CONNECTOR}.tar.gz \
+    -o ${CONNECTOR}.tar.gz
+
+RUN tar xvzf ${CONNECTOR}.tar.gz ${CONNECTOR}/${CONNECTOR}-bin.jar && \
     mv ${CONNECTOR}/${CONNECTOR}-bin.jar ${ALF_HOME}/tomcat/lib && \
     rm -rf /tmp/${CONNECTOR}*
 
 # this is for LDAP configuration
-RUN mkdir -p /alfresco/tomcat/shared/classes/alfresco/extension/subsystems/Authentication/ldap/ldap1/
-RUN mkdir -p /alfresco/tomcat/shared/classes/alfresco/extension/subsystems/Authentication/ldap-ad/ldap1/
-COPY assets/ldap-authentication.properties /alfresco/tomcat/shared/classes/alfresco/extension/subsystems/Authentication/ldap/ldap1/ldap-authentication.properties
-COPY assets/ldap-ad-authentication.properties /alfresco/tomcat/shared/classes/alfresco/extension/subsystems/Authentication/ldap-ad/ldap1/ldap-ad-authentication.properties
+WORKDIR /alfresco/tomcat/shared/classes/alfresco/extension/subsystems/Authentication
+RUN mkdir -p ldap/ldap1/
+RUN mkdir -p ldap-ad/ldap1/
+COPY assets/ldap-authentication.properties ldap/ldap1/ldap-authentication.properties
+COPY assets/ldap-ad-authentication.properties ldap-ad/ldap1/ldap-ad-authentication.properties
 
 # Copy ManualManager Add-On
 # Markdown manual editor and viewer
@@ -68,14 +73,17 @@ COPY assets/ldap-ad-authentication.properties /alfresco/tomcat/shared/classes/al
 
 # Copy Markdown Preview Add-On.
 # https://github.com/cetra3/md-preview
+WORKDIR /alfresco/amps_share
 RUN curl https://github.com/fjudith/md-preview/releases/download/${MD_PREVIEW_VERSION}/parashift-mdpreview-share-${MD_PREVIEW_VERSION}.amp \
-    -o /alfresco/amps_share/parashift-mdpreview-share-${MD_PREVIEW_VERSION}.amp
+    -o parashift-mdpreview-share-${MD_PREVIEW_VERSION}.amp
+
+WORKDIR /alfresco/amps/
 RUN curl https://github.com/fjudith/md-preview/releases/download/${MD_PREVIEW_VERSION}/parashift-mdpreview-repo-${MD_PREVIEW_VERSION}.amp \
-    -o /alfresco/amps/parashift-mdpreview-repo-${MD_PREVIEW_VERSION}.amp
+    -o parashift-mdpreview-repo-${MD_PREVIEW_VERSION}.amp
 
 # install scripts
 COPY docker-entrypoint.sh /alfresco/
-RUN chmod +x /alfresco/docker-entrypoint.sh 
+RUN chmod +x /alfresco/docker-entrypoint.sh
 COPY assets/supervisord.conf /etc/
 
 RUN mkdir -p /alfresco/tomcat/webapps/ROOT
