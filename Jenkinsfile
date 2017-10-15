@@ -64,6 +64,7 @@ pipeline {
                     }
                 }
             }
+        }
         stage ('Alfresco Web & Application server') {
             agent { label 'docker'}
             steps {
