@@ -164,7 +164,7 @@ pipeline {
                     DOCKER_SEARCH = sh("docker ps -qa -f ancestor=${REPO}:${COMMIT}-search")
                     DOCKER_REPO   = sh("docker ps -qa -f ancestor=${REPO}:${COMMIT}-repository")
                     DOCKER_SHA    = sh("docker ps -qa -f ancestor=${REPO}:${COMMIT}-share")
-                    echo ${DOCKER_OOO}
+                    echo "${DOCKER_OOO}"
                 }
             }
         }
