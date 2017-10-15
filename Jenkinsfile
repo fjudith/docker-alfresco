@@ -77,9 +77,6 @@ pipeline {
                     sh "docker run --rm --link alfresco-${BUILD_NUMBER}:alfresco blitznote/debootstrap-amd64:17.04 bash -c \"curl -i -X GET -u admin:admin http://alfresco:8080/alfresco/service/api/audit/control\""
                 }
                 post {
-                    always {
-                       sh 'docker rm -f alfresco-${BUILD_NUMBER}'
-                    }
                     success {
                         echo 'Tag and Push to private registry'
                         sh "docker tag ${REPO}:${COMMIT} ${PRIVATE_REPO}:${TAG}"
