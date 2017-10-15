@@ -66,33 +66,35 @@ pipeline {
             }
         }
         stage ('Docker build'){
-            parallel {
-                stage ('Alfresco Web & Application server') {
-                    agent { label 'docker'}
-                    steps {
-                        unstash 'manual-manager'
-                        unstash 'md-preview'
-                        sh 'tree -sh'
-                        sh "docker build -f slim/Dockerfile -t ${REPO}:${COMMIT} slim/"
-                        sh "docker run -d --name 'alfresco-${BUILD_NUMBER}' -p 55080:8080 -p 55443:8443 ${REPO}:${COMMIT}"
-                        sh "docker ps -a"
-                        sleep 300
-                        sh "docker logs alfresco-${BUILD_NUMBER}"
-                        sh 'docker run --rm --link alfresco-${BUILD_NUMBER}:alfresco blitznote/debootstrap-amd64:17.04 bash -c "curl -i -X GET -u admin:admin http://alfresco:8080/alfresco/service/api/audit/control"'
+            stage ('Alfresco Web & Application server') {
+                agent { label 'docker'}
+                steps {
+                    unstash 'manual-manager'
+                    unstash 'md-preview'
+                    sh 'tree -sh'
+                    sh "docker build -f slim/Dockerfile -t ${REPO}:${COMMIT} slim/"
+                    sh "docker run -d --name 'alfresco-${BUILD_NUMBER}' -p 55080:8080 -p 55443:8443 ${REPO}:${COMMIT}"
+                    sh "docker ps -a"
+                    sleep 300
+                    sh "docker logs alfresco-${BUILD_NUMBER}"
+                    sh 'docker run --rm --link alfresco-${BUILD_NUMBER}:alfresco blitznote/debootstrap-amd64:17.04 bash -c "curl -i -X GET -u admin:admin http://alfresco:8080/alfresco/service/api/audit/control"'
+                }
+                post {
+                    always {
+                       sh 'docker rm -f alfresco-${BUILD_NUMBER}'
                     }
-                    post {
-                        always {
-                           sh 'docker rm -f alfresco-${BUILD_NUMBER}'
-                        }
-                        success {
-                            echo 'Tag and Push to private registry'
-                            sh "docker tag ${REPO}:${COMMIT} ${REPO}:${TAG}"
-                            sh "docker tag ${REPO}:${COMMIT} ${PRIVATE_REPO}:${TAG}"
-                            sh "docker login -u ${DOCKER_PRIVATE_USR} -p ${DOCKER_PRIVATE_PSW} ${PRIVATE_REGISTRY}"
-                            sh "docker push ${PRIVATE_REPO}:${TAG}"
-                        }
+                    success {
+                        echo 'Tag and Push to private registry'
+                        sh "docker tag ${REPO}:${COMMIT} ${REPO}:${TAG}"
+                        sh "docker tag ${REPO}:${COMMIT} ${PRIVATE_REPO}:${TAG}"
+                        sh "docker login -u ${DOCKER_PRIVATE_USR} -p ${DOCKER_PRIVATE_PSW} ${PRIVATE_REGISTRY}"
+                        sh "docker push ${PRIVATE_REPO}:${TAG}"
                     }
                 }
+            }
+        }
+        stage ('Docker build Micro-Service'){
+            parallel {
                 stage ('Alfresco LibreOffice') {
                     agent { label 'docker'}
                     steps {
@@ -105,9 +107,6 @@ pipeline {
                         sh 'docker exec libreoffice-${BUILD_NUMBER} /bin/bash -c "nc -zv -w 5 localhost 8100"'
                     }
                     post {
-                        always {
-                           sh 'docker rm -f libreoffice-${BUILD_NUMBER}'
-                        }
                         success {
                             echo 'Tag and Push to private registry'
                             sh "docker tag ${REPO}:${COMMIT}-libreoffice ${REPO}:${ALF_OOO}"
@@ -129,9 +128,6 @@ pipeline {
                         sh 'docker run --rm --link search-${BUILD_NUMBER}:search blitznote/debootstrap-amd64:17.04 bash -c "curl -i -X GET http://search:8983/solr/admin/cores"'
                     }
                     post {
-                        always {
-                           sh 'docker rm -f search-${BUILD_NUMBER}'
-                        }
                         success {
                             echo 'Tag and Push to private registry'
                             sh "docker tag ${REPO}:${COMMIT}-search ${REPO}:${ALF_SEARCH}"
@@ -149,16 +145,13 @@ pipeline {
                         sh 'tree -sh'
                         sh "docker build -f repository/Dockerfile -t ${REPO}:${COMMIT}-repository repository/"
                         sh "docker run -d --name 'postgres-${BUILD_NUMBER}' -e POSTGRES_USER=alfresco -e POSTGRES_PASSWORD=alfresco -POSTGRES_DB=alfresco amd64/postgres:9.4"
-                        sh "docker run -d --name 'repository-${BUILD_NUMBER}' --link postgres-${BUILD_NUMBER}:postgres --link libreoffice-${BUILD_NUMBER}:libreoffice -p 56080:8080 -p 56443:8443 ${REPO}:${COMMIT}-repository"
+                        sh "docker run -d --name 'repository-${BUILD_NUMBER}' --link postgres-${BUILD_NUMBER}:postgres --link libreoffice-${BUILD_NUMBER}:libreoffice --link search-${BUILD_NUMBER}:search -p 56080:8080 -p 56443:8443 ${REPO}:${COMMIT}-repository"
                         sh "docker ps -a"
-                        sleep 300
+                        sleep 30
                         sh "docker logs repository-${BUILD_NUMBER}"
-                        sh 'docker run --rm --link repository-${BUILD_NUMBER}:repository blitznote/debootstrap-amd64:17.04 bash -c "curl -i -X GET -u admin:admin http://repository:8080/alfresco/service/api/audit/control"'
+                        sh "docker run --rm --link repository-${BUILD_NUMBER}:repository blitznote/debootstrap-amd64:17.04 bash -c \"curl -i -X GET -u admin:admin http://repository:8080/alfresco/service/api/audit/control\""
                     }
                     post {
-                        always {
-                           sh 'docker rm -f repository-${BUILD_NUMBER}'
-                        }
                         success {
                             echo 'Tag and Push to private registry'
                             sh "docker tag ${REPO}:${COMMIT}-repository ${REPO}:${ALF_REPO}"
@@ -182,9 +175,6 @@ pipeline {
                         sh 'docker run --rm --link share-${BUILD_NUMBER}:share blitznote/debootstrap-amd64:17.04 bash -c "curl -i -X GET -u admin:admin http://share:8080/share/page"'
                     }
                     post {
-                        always {
-                           sh 'docker rm -f share-${BUILD_NUMBER}'
-                        }
                         success {
                             echo 'Tag and Push to private registry'
                             sh "docker tag ${REPO}:${COMMIT}-share ${REPO}:${ALF_SHA}"
@@ -195,12 +185,21 @@ pipeline {
                     }
                 }
             }
+            post {
+                always {
+                    sh 'docker rm -f search-${BUILD_NUMBER}'
+                    sh 'docker rm -f libreoffice-${BUILD_NUMBER}'
+                    sh 'docker rm -f repository-${BUILD_NUMBER}'
+                    sh 'docker rm -f share-${BUILD_NUMBER}'
+                }
+            }
         }
     }
     post {
         always {
             echo 'Run regardless of the completion status of the Pipeline run.'
             sh 'docker rm -f postgres-${BUILD_NUMBER}'
+            
         }
         changed {
             echo 'Only run if the current Pipeline run has a different status from the previously completed Pipeline.'
