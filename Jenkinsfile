@@ -64,8 +64,6 @@ pipeline {
                     }
                 }
             }
-        }
-        stage ('Docker build'){
             stage ('Alfresco Web & Application server') {
                 agent { label 'docker'}
                 steps {
@@ -84,7 +82,7 @@ pipeline {
                 }
             }
         }
-        stage ('Docker build Micro-Service'){
+        stages ('Docker build Micro-Service'){
             parallel {
                 stage ('Alfresco LibreOffice') {
                     agent { label 'docker'}
