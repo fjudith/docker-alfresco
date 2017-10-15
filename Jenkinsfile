@@ -135,7 +135,7 @@ pipeline {
                     agent { label 'docker' }
                     steps {
                         // Start database
-                        sh "docker run -d --name 'mysql-${BUILD_NUMBER}' -e MYSQL_USER=alfresco -e MYSQL_PASSWORD=alfresco -e MYSQL_DATABASE=alfresco amd64/mysql:5.6"
+                        sh "docker run -d --name 'mysql-${BUILD_NUMBER}' -e MYSQL_ROOT_PASSWORD=alfresco -e MYSQL_USER=alfresco -e MYSQL_PASSWORD=alfresco -e MYSQL_DATABASE=alfresco amd64/mysql:5.6"
                         sleep 30
                         sh "docker logs mysql-${BUILD_NUMBER}"
                         // Start application
