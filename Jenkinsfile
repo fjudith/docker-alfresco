@@ -13,7 +13,8 @@ pipeline {
         stage ('Checkout') {
             steps {
                 script {
-                    COMMIT = sh(returnStdout: true, script: "git log -n 1 --pretty=format:'%h'").trim()
+                    COMMIT = "${GIT_COMMIT.substring(0,8)}"
+                    echo "${COMMIT}"
                     if ("${BRANCH_NAME}" == "master"){
                         TAG = "latest"
                         ALF_OOO = "libreoffice"
