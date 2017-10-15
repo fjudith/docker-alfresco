@@ -158,6 +158,7 @@ pipeline {
             }
         }
         stage ('Get container id') {
+            agent { label 'docker' }
             steps {
                 script {
                     DOCKER_OOO    = sh("docker ps -qa -f ancestor=${REPO}:${COMMIT}-libreoffice")
