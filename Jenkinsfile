@@ -69,11 +69,6 @@ pipeline {
             agent { label 'docker'}
             steps {
                 sh "docker build -f slim/Dockerfile -t ${REPO}:${COMMIT} slim/"
-                sh "docker run -d --name 'alfresco-${BUILD_NUMBER}' -p 55080:8080 -p 55443:8443 ${REPO}:${COMMIT}"
-                sh "docker ps -a"
-                sleep 300
-                sh "docker logs alfresco-${BUILD_NUMBER}"
-                sh "docker run --rm --link alfresco-${BUILD_NUMBER}:alfresco blitznote/debootstrap-amd64:17.04 bash -c \"curl -i -X GET -u admin:admin http://alfresco:8080/alfresco/service/api/audit/control\""
             }
             post {
                 success {
@@ -82,9 +77,9 @@ pipeline {
                 }
             }
         }
-        stage ('Alfresco LibreOffice') {
+        stage ('Docker build Micro-Service') {
             parallel {
-                stage ('Docker build Micro-Service'){
+                stage ('Alfresco LibreOffice'){
                     agent { label 'docker'}
                     steps {
                         sh "docker build -f libreoffice/Dockerfile -t ${REPO}:${COMMIT}-libreoffice libreoffice/"
@@ -141,6 +136,7 @@ pipeline {
                     steps {
                         // Start database
                         sh "docker run -d --name 'mysql-${BUILD_NUMBER}' -e MYSQL_USER=alfresco -e MYSQL_PASSWORD=alfresco -e MYSQL_DATABASE=alfresco amd64/mysql:5.6"
+                        sleep 30
                         // Start application
                         sh "docker run -d --name 'alfresco-${BUILD_NUMBER}' --link mysql-${BUILD_NUMBER}:mysql ${REPO}:${COMMIT}"
                     }
@@ -150,10 +146,43 @@ pipeline {
                     steps {
                         // Start database
                         sh "docker run -d --name 'postgres-${BUILD_NUMBER}' -e POSTGRES_USER=alfresco -e POSTGRES_PASSWORD=alfresco -e POSTGRES_DB=alfresco amd64/postgres:9.4"
+                        sleep 30
                         //Start application micro-services
-                        sh "docker run -d --name 'libreoffice-${BUILD_NUMBER}' -p 56082:8100 ${REPO}:${COMMIT}-libreoffice"
-                        sh "docker run -d --name 'search-${BUILD_NUMBER}' -p 56082:8100 ${REPO}:${COMMIT}-search"
-                        sh "docker run -d --name 'repository-${BUILD_NUMBER}' --link postgres-${BUILD_NUMBER}:postgres --link libreoffice-${BUILD_NUMBER}:libreoffice --link search-${BUILD_NUMBER}:search -p 56080:8080 -p 56443:8443 ${REPO}:${COMMIT}-repository"
+                        sh "docker run -d --name 'libreoffice-${BUILD_NUMBER}' ${REPO}:${COMMIT}-libreoffice"
+                        sh "docker run -d --name 'search-${BUILD_NUMBER}' ${REPO}:${COMMIT}-search"
+                        sh "docker run -d --name 'repository-${BUILD_NUMBER}' --link postgres-${BUILD_NUMBER}:postgres --link libreoffice-${BUILD_NUMBER}:libreoffice --link search-${BUILD_NUMBER}:search ${REPO}:${COMMIT}-repository"
+                        sh "docker run -d --name share-${BUILD_NUMBER} --link repository-${BUILD_NUMBER}:repository ${REPO}:${COMMIT}-share"
+                    }
+                }
+            }
+        }
+        stage ('Test'){
+            parallel {
+                stage ('Slim'){
+                    agent { label 'docker' }
+                    steps {
+                        // internal
+                        sh "docker exec 'alfresco-${BUILD_NUMBER}' /bin/bash -c 'curl -i -X GET -u admin:admin http://localhost:8080/alfresco/service/api/audit/control'"
+                        // External
+                        // External
+                        sh "docker run --rm --link alfresco-${BUILD_NUMBER}:alfresco blitznote/debootstrap-amd64:17.04 bash -c 'curl -i -X GET -u admin:admin http://alfresco-${BUILD_NUMBER}:8080/share/page'"
+                    }
+                }
+                stage ('Micro-Services'){
+                    agent { label 'docker'}
+                    steps {
+                        // Internal
+                        sh "docker exec libreoffice-${BUILD_NUMBER} /bin/bash -c 'nc -zv -w 5 localhost 8100'"
+                        sh "docker exec search-${BUILD_NUMBER} /bin/bash -c 'curl -i -X GET http://localhost:8983/solr/admin/cores'"
+                        sh "docker exec repository-${BUILD_NUMBER} /bin/bash -c 'curl -i -X GET -u admin:admin http://localhost:8080/alfresco/service/api/audit/control'"
+                        sh "docker exec share-${BUILD_NUMBER} /bin/bash -c 'curl -i -X GET -u admin:admin http://localhost:8080/share/page'"
+                        // Cross Container
+                        sh "docker exec repository-${BUILD_NUMBER} /bin/bash -c 'nc -zv -w 5 libreoffice-${BUILD_NUMBER} 8100'"
+                        sh "docker exec repository-${BUILD_NUMBER} /bin/bash -c 'curl -i -X GET http://search-${BUILD_NUMBER}:8983/solr/admin/cores\'"
+                        sh "docker exec search-${BUILD_NUMBER} /bin/bash -c 'curl -i -X GET -u admin:admin http://repository-${BUILD_NUMBER}:8080/alfresco/service/api/audit/control'"
+                        sh "docker exec share-${BUILD_NUMBER} /bin/bash -c 'curl -i -X GET -u admin:admin http://repository-${BUILD_NUMBER}:8080/alfresco/service/api/audit/control'"
+                        // External
+                        sh "docker run --rm --link share-${BUILD_NUMBER}:share blitznote/debootstrap-amd64:17.04 bash -c 'curl -i -X GET -u admin:admin http://share-${BUILD_NUMBER}:8080/share/page'"
                     }
                 }
             }
@@ -163,8 +192,9 @@ pipeline {
         always {
             echo 'Run regardless of the completion status of the Pipeline run.'
             echo 'Remove slim stack'
-            sh "docker rm -f alfresco-${BUILD_NUMBER}"
             sh "docker rm -f mysql-${BUILD_NUMBER}"
+            sh "docker rm -f alfresco-${BUILD_NUMBER}"
+
             echo 'Remove micro-services stack'
             sh "docker rm -f postgres-${BUILD_NUMBER}"
             sh "docker rm -f share-${BUILD_NUMBER}"

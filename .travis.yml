@@ -41,13 +41,13 @@ script:
   # -i, --include – include protocol headers in the output (H/F)
   # -X, --request – specify request  COMMAND (GET, PUT, DELETE…)  to use
   - docker exec ${DOCKER_ALF} /bin/bash -c "curl -i -X GET -u admin:admin http://localhost:8080/alfresco/service/api/audit/control"
-  - docker exec ${DOCKER_REPO} /bin/bash -c "curl -i -X GET -u admin:admin http://localhost:8080/alfresco/service/api/audit/control"
   - docker exec ${DOCKER_OOO} /bin/bash -c "nc -zv -w 5 localhost 8100"
   - docker exec ${DOCKER_SEARCH} /bin/bash -c "curl -i -X GET http://localhost:8983/solr/admin/cores"
+  - docker exec ${DOCKER_REPO} /bin/bash -c "curl -i -X GET -u admin:admin http://localhost:8080/alfresco/service/api/audit/control"
   - docker exec ${DOCKER_SHA} /bin/bash -c "curl -iL -X GET -u admin:admin  http://localhost:8080/share/page"
   # Container inter-networking test
-  - docker exec ${DOCKER_REPO} /bin/bash -c "curl -i -X GET http://${DOCKER_SEARCH}:8983/solr/admin/cores"
   - docker exec ${DOCKER_REPO} /bin/bash -c "nc -zv -w 5 ${DOCKER_OOO} 8100"
+  - docker exec ${DOCKER_REPO} /bin/bash -c "curl -i -X GET http://${DOCKER_SEARCH}:8983/solr/admin/cores"
   - docker exec ${DOCKER_SEARCH} /bin/bash -c "curl -i -X GET -u admin:admin http://${DOCKER_REPO}:8080/alfresco/service/api/audit/control"
   - docker exec ${DOCKER_SHA} /bin/bash -c "curl -i -X GET -u admin:admin http://${DOCKER_REPO}:8080/alfresco/service/api/audit/control"
   - curl -iL -X GET -u admin:admin http://localhost:8080/share/page
