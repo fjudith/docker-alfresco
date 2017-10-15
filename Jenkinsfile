@@ -161,10 +161,10 @@ pipeline {
             agent { label 'docker' }
             steps {
                 script {
-                    DOCKER_OOO    = sh("docker ps -qa -f ancestor=${REPO}:${COMMIT}-libreoffice")
-                    DOCKER_SEARCH = sh("docker ps -qa -f ancestor=${REPO}:${COMMIT}-search")
-                    DOCKER_REPO   = sh("docker ps -qa -f ancestor=${REPO}:${COMMIT}-repository")
-                    DOCKER_SHA    = sh("docker ps -qa -f ancestor=${REPO}:${COMMIT}-share")
+                    DOCKER_OOO    = sh("docker ps -qa -f ancestor=${REPO}:${COMMIT}-libreoffice", returnStdout: true).trim()
+                    DOCKER_SEARCH = sh("docker ps -qa -f ancestor=${REPO}:${COMMIT}-search", returnStdout: true).trim()
+                    DOCKER_REPO   = sh("docker ps -qa -f ancestor=${REPO}:${COMMIT}-repository", returnStdout: true).trim()
+                    DOCKER_SHA    = sh("docker ps -qa -f ancestor=${REPO}:${COMMIT}-share", returnStdout: true).trim()
                     echo "${DOCKER_OOO}"
                 }
             }
