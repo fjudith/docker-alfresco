@@ -14,7 +14,7 @@ pipeline {
             steps {
                 script {
                     COMMIT = "${GIT_COMMIT.substring(0,8)}"
-                    echo "${COMMIT}"
+
                     if ("${BRANCH_NAME}" == "master"){
                         TAG = "latest"
                         ALF_OOO = "libreoffice"
@@ -73,8 +73,8 @@ pipeline {
                         unstash 'manual-manager'
                         unstash 'md-preview'
                         sh 'tree -sh'
-                        sh "docker build -f slim/Dockerfile -t ${REPO}:${GIT_COMMIT} slim/"
-                        sh "docker run -d --name 'alfresco-${BUILD_NUMBER}' -p 55080:8080 -p 55443:8443 ${REPO}:${GIT_COMMIT}"
+                        sh "docker build -f slim/Dockerfile -t ${REPO}:${COMMIT} slim/"
+                        sh "docker run -d --name 'alfresco-${BUILD_NUMBER}' -p 55080:8080 -p 55443:8443 ${REPO}:${COMMIT}"
                         sh "docker ps -a"
                         sleep 300
                         sh "docker logs alfresco-${BUILD_NUMBER}"
@@ -86,8 +86,8 @@ pipeline {
                         }
                         success {
                             echo 'Tag and Push to private registry'
-                            sh "docker tag ${REPO}:${GIT_COMMIT} ${REPO}:${TAG}"
-                            sh "docker tag ${REPO}:${GIT_COMMIT} ${PRIVATE_REPO}:${TAG}"
+                            sh "docker tag ${REPO}:${COMMIT} ${REPO}:${TAG}"
+                            sh "docker tag ${REPO}:${COMMIT} ${PRIVATE_REPO}:${TAG}"
                             sh "docker login -u ${DOCKER_PRIVATE_USR} -p ${DOCKER_PRIVATE_PSW} ${PRIVATE_REGISTRY}"
                             sh "docker push ${PRIVATE_REPO}:${TAG}"
                         }
@@ -97,8 +97,8 @@ pipeline {
                     agent { label 'docker'}
                     steps {
                         sh 'tree -sh'
-                        sh "docker build -f libreoffice/Dockerfile -t ${REPO}:${GIT_COMMIT}-libreoffice libreoffice/"
-                        sh "docker run -d --name 'libreoffice-${BUILD_NUMBER}' -p 56082:8100 ${REPO}:${GIT_COMMIT}-libreoffice"
+                        sh "docker build -f libreoffice/Dockerfile -t ${REPO}:${COMMIT}-libreoffice libreoffice/"
+                        sh "docker run -d --name 'libreoffice-${BUILD_NUMBER}' -p 56082:8100 ${REPO}:${COMMIT}-libreoffice"
                         sh "docker ps -a"
                         sleep 300
                         sh "docker logs libreoffice-${BUILD_NUMBER}"
@@ -110,8 +110,8 @@ pipeline {
                         }
                         success {
                             echo 'Tag and Push to private registry'
-                            sh "docker tag ${REPO}:${GIT_COMMIT}-libreoffice ${REPO}:${ALF_OOO}"
-                            sh "docker tag ${REPO}:${GIT_COMMIT}-libreoffice ${PRIVATE_REPO}:${ALF_OOO}"
+                            sh "docker tag ${REPO}:${COMMIT}-libreoffice ${REPO}:${ALF_OOO}"
+                            sh "docker tag ${REPO}:${COMMIT}-libreoffice ${PRIVATE_REPO}:${ALF_OOO}"
                             sh "docker login -u ${DOCKER_PRIVATE_USR} -p ${DOCKER_PRIVATE_PSW} ${PRIVATE_REGISTRY}"
                             sh "docker push ${PRIVATE_REPO}:${ALF_OOO}"
                         }
@@ -121,8 +121,8 @@ pipeline {
                     agent { label 'docker'}
                     steps {
                         sh 'tree -sh'
-                        sh "docker build -f search/Dockerfile -t ${REPO}:${GIT_COMMIT}-search search/"
-                        sh "docker run -d --name 'search-${BUILD_NUMBER}' -p 56082:8100 ${REPO}:${GIT_COMMIT}-search"
+                        sh "docker build -f search/Dockerfile -t ${REPO}:${COMMIT}-search search/"
+                        sh "docker run -d --name 'search-${BUILD_NUMBER}' -p 56082:8100 ${REPO}:${COMMIT}-search"
                         sh "docker ps -a"
                         sleep 300
                         sh "docker logs search-${BUILD_NUMBER}"
@@ -134,8 +134,8 @@ pipeline {
                         }
                         success {
                             echo 'Tag and Push to private registry'
-                            sh "docker tag ${REPO}:${GIT_COMMIT}-search ${REPO}:${ALF_SEARCH}"
-                            sh "docker tag ${REPO}:${GIT_COMMIT}-search ${PRIVATE_REPO}:${ALF_SEARCH}"
+                            sh "docker tag ${REPO}:${COMMIT}-search ${REPO}:${ALF_SEARCH}"
+                            sh "docker tag ${REPO}:${COMMIT}-search ${PRIVATE_REPO}:${ALF_SEARCH}"
                             sh "docker login -u ${DOCKER_PRIVATE_USR} -p ${DOCKER_PRIVATE_PSW} ${PRIVATE_REGISTRY}"
                             sh "docker push ${PRIVATE_REPO}:${ALF_SEARCH}"
                         }
@@ -147,9 +147,9 @@ pipeline {
                         unstash 'manual-manager'
                         unstash 'md-preview'
                         sh 'tree -sh'
-                        sh "docker build -f platform/Dockerfile -t ${REPO}:${GIT_COMMIT}-platform platform/"
+                        sh "docker build -f platform/Dockerfile -t ${REPO}:${COMMIT}-platform platform/"
                         sh "docker run -d --name 'postgres-${BUILD_NUMBER}' -e POSTGRES_USER=alfresco -e POSTGRES_PASSWORD=alfresco -POSTGRES_DB=alfresco amd64/postgres:9.4"
-                        sh "docker run -d --name 'platform-${BUILD_NUMBER}' --link postgres-${BUILD_NUMBER}:postgres --link libreoffice-${BUILD_NUMBER}:libreoffice -p 56080:8080 -p 56443:8443 ${REPO}:${GIT_COMMIT}-platform"
+                        sh "docker run -d --name 'platform-${BUILD_NUMBER}' --link postgres-${BUILD_NUMBER}:postgres --link libreoffice-${BUILD_NUMBER}:libreoffice -p 56080:8080 -p 56443:8443 ${REPO}:${COMMIT}-platform"
                         sh "docker ps -a"
                         sleep 300
                         sh "docker logs platform-${BUILD_NUMBER}"
@@ -161,8 +161,8 @@ pipeline {
                         }
                         success {
                             echo 'Tag and Push to private registry'
-                            sh "docker tag ${REPO}:${GIT_COMMIT}-platform ${REPO}:${ALF_REPO}"
-                            sh "docker tag ${REPO}:${GIT_COMMIT}-platform ${PRIVATE_REPO}:${ALF_REPO}"
+                            sh "docker tag ${REPO}:${COMMIT}-platform ${REPO}:${ALF_REPO}"
+                            sh "docker tag ${REPO}:${COMMIT}-platform ${PRIVATE_REPO}:${ALF_REPO}"
                             sh "docker login -u ${DOCKER_PRIVATE_USR} -p ${DOCKER_PRIVATE_PSW} ${PRIVATE_REGISTRY}"
                             sh "docker push ${PRIVATE_REPO}:${ALF_REPO}"
                         }
@@ -174,9 +174,9 @@ pipeline {
                         unstash 'manual-manager'
                         unstash 'md-preview'
                         sh 'tree -sh'
-                        sh "docker build -f share/Dockerfile -t ${REPO}:${GIT_COMMIT}-share share/"
+                        sh "docker build -f share/Dockerfile -t ${REPO}:${COMMIT}-share share/"
                         sh "docker run -d --name 'postgres-${BUILD_NUMBER}' -e POSTGRES_USER=alfresco -e POSTGRES_PASSWORD=alfresco -POSTGRES_DB=alfresco amd64/postgres:9.4"
-                        sh "docker run -d --name 'share-${BUILD_NUMBER}' --link postgres-${BUILD_NUMBER}:postgres --link libreoffice-${BUILD_NUMBER}:libreoffice -p 56080:8080 -p 56443:8443 ${REPO}:${GIT_COMMIT}-share"
+                        sh "docker run -d --name 'share-${BUILD_NUMBER}' --link postgres-${BUILD_NUMBER}:postgres --link libreoffice-${BUILD_NUMBER}:libreoffice -p 56080:8080 -p 56443:8443 ${REPO}:${COMMIT}-share"
                         sh "docker ps -a"
                         sleep 300
                         sh "docker logs share-${BUILD_NUMBER}"
@@ -188,8 +188,8 @@ pipeline {
                         }
                         success {
                             echo 'Tag and Push to private registry'
-                            sh "docker tag ${REPO}:${GIT_COMMIT}-share ${REPO}:${ALF_SHA}"
-                            sh "docker tag ${REPO}:${GIT_COMMIT}-share ${PRIVATE_REPO}:${ALF_SHA}"
+                            sh "docker tag ${REPO}:${COMMIT}-share ${REPO}:${ALF_SHA}"
+                            sh "docker tag ${REPO}:${COMMIT}-share ${PRIVATE_REPO}:${ALF_SHA}"
                             sh "docker login -u ${DOCKER_PRIVATE_USR} -p ${DOCKER_PRIVATE_PSW} ${PRIVATE_REGISTRY}"
                             sh "docker push ${PRIVATE_REPO}"
                         }
