@@ -64,21 +64,20 @@ pipeline {
                     }
                 }
             }
-            stage ('Alfresco Web & Application server') {
-                agent { label 'docker'}
-                steps {
-                    sh "docker build -f slim/Dockerfile -t ${REPO}:${COMMIT} slim/"
-                    sh "docker run -d --name 'alfresco-${BUILD_NUMBER}' -p 55080:8080 -p 55443:8443 ${REPO}:${COMMIT}"
-                    sh "docker ps -a"
-                    sleep 300
-                    sh "docker logs alfresco-${BUILD_NUMBER}"
-                    sh "docker run --rm --link alfresco-${BUILD_NUMBER}:alfresco blitznote/debootstrap-amd64:17.04 bash -c \"curl -i -X GET -u admin:admin http://alfresco:8080/alfresco/service/api/audit/control\""
-                }
-                post {
-                    success {
-                        echo 'Tag and Push to private registry'
-                        sh "docker tag ${REPO}:${COMMIT} ${PRIVATE_REPO}:${TAG}"
-                    }
+        stage ('Alfresco Web & Application server') {
+            agent { label 'docker'}
+            steps {
+                sh "docker build -f slim/Dockerfile -t ${REPO}:${COMMIT} slim/"
+                sh "docker run -d --name 'alfresco-${BUILD_NUMBER}' -p 55080:8080 -p 55443:8443 ${REPO}:${COMMIT}"
+                sh "docker ps -a"
+                sleep 300
+                sh "docker logs alfresco-${BUILD_NUMBER}"
+                sh "docker run --rm --link alfresco-${BUILD_NUMBER}:alfresco blitznote/debootstrap-amd64:17.04 bash -c \"curl -i -X GET -u admin:admin http://alfresco:8080/alfresco/service/api/audit/control\""
+            }
+            post {
+                success {
+                    echo 'Tag and Push to private registry'
+                    sh "docker tag ${REPO}:${COMMIT} ${PRIVATE_REPO}:${TAG}"
                 }
             }
         }
@@ -139,7 +138,7 @@ pipeline {
         }
     }
     stages {
-        stage ('RUN'){
+        stage ('Run'){
             parallel {
                 stage ('Slim'){
                     agent { label 'docker' }
