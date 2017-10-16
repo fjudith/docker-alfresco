@@ -180,6 +180,16 @@ pipeline {
                         // External
                         sh "docker run --rm blitznote/debootstrap-amd64:17.04 bash -c 'curl -i -X GET -u admin:admin http://${DOCKER_ALF}:8080/share/page'"
                     }
+                    post {
+                        always {
+                            echo 'Remove slim stack'
+                            sh "docker rm -f mysql-${BUILD_NUMBER}"
+                            sh "docker rm -f alfresco-${BUILD_NUMBER}"
+                        }
+                        success {
+
+                        }
+                    }
                 }
                 stage ('Micro-Services'){
                     agent { label 'docker'}
@@ -198,6 +208,17 @@ pipeline {
                         // External
                         sh "docker run --rm --link share-${BUILD_NUMBER}:share blitznote/debootstrap-amd64:17.04 bash -c 'curl -i -X GET -u admin:admin http://share-${BUILD_NUMBER}:8080/share/page'"
                     }
+                    post {
+                        always {
+                            echo 'Remove micro-services stack'
+
+                            sh "docker rm -f postgres-${BUILD_NUMBER}"
+                            sh "docker rm -f share-${BUILD_NUMBER}"
+                            sh "docker rm -f repository-${BUILD_NUMBER}"
+                            sh "docker rm -f search-${BUILD_NUMBER}"
+                            sh "docker rm -f libreoffice-${BUILD_NUMBER}"
+                        }
+                    }
                 }
             }
         }
@@ -205,16 +226,6 @@ pipeline {
     post {
         always {
             echo 'Run regardless of the completion status of the Pipeline run.'
-            echo 'Remove slim stack'
-            sh "docker rm -f mysql-${BUILD_NUMBER}"
-            sh "docker rm -f alfresco-${BUILD_NUMBER}"
-
-            echo 'Remove micro-services stack'
-            sh "docker rm -f postgres-${BUILD_NUMBER}"
-            sh "docker rm -f share-${BUILD_NUMBER}"
-            sh "docker rm -f repository-${BUILD_NUMBER}"
-            sh "docker rm -f search-${BUILD_NUMBER}"
-            sh "docker rm -f libreoffice-${BUILD_NUMBER}"
         }
         changed {
             echo 'Only run if the current Pipeline run has a different status from the previously completed Pipeline.'
