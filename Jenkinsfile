@@ -161,6 +161,7 @@ pipeline {
             agent { label 'docker' }
             steps {
                 script {
+                    sleep 180
                     DOCKER_ALF    = sh(script: "docker ps -qa -f ancestor=${REPO}:${COMMIT}", returnStdout: true).trim()
                     DOCKER_OOO    = sh(script: "docker ps -qa -f ancestor=${REPO}:${COMMIT}-libreoffice", returnStdout: true).trim()
                     DOCKER_SEARCH = sh(script: "docker ps -qa -f ancestor=${REPO}:${COMMIT}-search", returnStdout: true).trim()
@@ -174,7 +175,7 @@ pipeline {
                 stage ('Slim'){
                     agent { label 'docker' }
                     steps {
-                        sleep 240
+                        
                         // internal
                         sh "docker exec 'alfresco-${BUILD_NUMBER}' /bin/bash -c 'curl -i -X GET -u admin:admin http://localhost:8080/alfresco/service/api/audit/control'"
                         // External
@@ -195,7 +196,6 @@ pipeline {
                 stage ('Micro-Services'){
                     agent { label 'docker'}
                     steps {
-                        sleep 240
                         // Internal
                         sh "docker exec libreoffice-${BUILD_NUMBER} /bin/bash -c 'nc -zv -w 5 localhost 8100'"
                         sh "docker exec search-${BUILD_NUMBER} /bin/bash -c 'curl -i -X GET http://localhost:8983/solr/admin/cores'"
@@ -207,7 +207,7 @@ pipeline {
                         sh "docker exec ${DOCKER_SEARCH} /bin/bash -c 'curl -i -X GET -u admin:admin http://${DOCKER_REPO}:8080/alfresco/service/api/audit/control'"
                         sh "docker exec ${DOCKER_SHA} /bin/bash -c 'curl -i -X GET -u admin:admin http://${DOCKER_SHA}:8080/alfresco/service/api/audit/control'"
                         // External
-                        sh "docker run --rm --link share-${BUILD_NUMBER}:share blitznote/debootstrap-amd64:17.04 bash -c 'curl -i -X GET -u admin:admin http://share-${BUILD_NUMBER}:8080/share/page'"
+                        sh "docker run --rm blitznote/debootstrap-amd64:17.04 bash -c 'curl -i -X GET -u admin:admin http://${DOCKER_SHA}:8080/share/page'"
                     }
                     post {
                         always {
