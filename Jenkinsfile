@@ -141,7 +141,9 @@ pipeline {
                         // Start application
                         sh "docker run -d --name 'alfresco-${BUILD_NUMBER}' --link mysql-${BUILD_NUMBER}:mysql ${REPO}:${COMMIT}"
                         // Get container ID
-                        DOCKER_ALF    = sh(script: "docker ps -qa -f ancestor=${REPO}:${COMMIT}", returnStdout: true).trim()
+                        script{
+                            DOCKER_ALF    = sh(script: "docker ps -qa -f ancestor=${REPO}:${COMMIT}", returnStdout: true).trim()
+                        }
                     }
                 }
                 stage ('Micro-Services'){
@@ -156,10 +158,12 @@ pipeline {
                         sh "docker run -d --name 'repository-${BUILD_NUMBER}' --link postgres-${BUILD_NUMBER}:postgres --link libreoffice-${BUILD_NUMBER}:libreoffice --link search-${BUILD_NUMBER}:search ${REPO}:${COMMIT}-repository"
                         sh "docker run -d --name share-${BUILD_NUMBER} --link repository-${BUILD_NUMBER}:repository ${REPO}:${COMMIT}-share"
                         // Get container IDs
-                        DOCKER_OOO    = sh(script: "docker ps -qa -f ancestor=${REPO}:${COMMIT}-libreoffice", returnStdout: true).trim()
-                        DOCKER_SEARCH = sh(script: "docker ps -qa -f ancestor=${REPO}:${COMMIT}-search", returnStdout: true).trim()
-                        DOCKER_REPO   = sh(script: "docker ps -qa -f ancestor=${REPO}:${COMMIT}-repository", returnStdout: true).trim()
-                        DOCKER_SHA    = sh(script: "docker ps -qa -f ancestor=${REPO}:${COMMIT}-share", returnStdout: true).trim()
+                        script {
+                            DOCKER_OOO    = sh(script: "docker ps -qa -f ancestor=${REPO}:${COMMIT}-libreoffice", returnStdout: true).trim()
+                            DOCKER_SEARCH = sh(script: "docker ps -qa -f ancestor=${REPO}:${COMMIT}-search", returnStdout: true).trim()
+                            DOCKER_REPO   = sh(script: "docker ps -qa -f ancestor=${REPO}:${COMMIT}-repository", returnStdout: true).trim()
+                            DOCKER_SHA    = sh(script: "docker ps -qa -f ancestor=${REPO}:${COMMIT}-share", returnStdout: true).trim()
+                        }
                     }
                 }
             }
