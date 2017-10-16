@@ -134,6 +134,7 @@ pipeline {
                 stage ('Slim'){
                     agent { label 'docker' }
                     steps {
+
                         // Start database
                         sh "docker run -d --name 'mysql-${BUILD_NUMBER}' -e MYSQL_ROOT_PASSWORD=alfresco -e MYSQL_USER=alfresco -e MYSQL_PASSWORD=alfresco -e MYSQL_DATABASE=alfresco amd64/mysql:5.6"
                         sleep 15
@@ -149,14 +150,16 @@ pipeline {
                 stage ('Micro-Services'){
                     agent { label 'docker'}
                     steps {
+                        // Create Network
+                        sh "docker network create alfresco-micro-${BUILD_NUMBER}"
                         // Start database
-                        sh "docker run -d --name 'postgres-${BUILD_NUMBER}' -e POSTGRES_USER=alfresco -e POSTGRES_PASSWORD=alfresco -e POSTGRES_DB=alfresco amd64/postgres:9.4"
+                        sh "docker run -d --name 'postgres-${BUILD_NUMBER}' -e POSTGRES_USER=alfresco -e POSTGRES_PASSWORD=alfresco -e POSTGRES_DB=alfresco --network alfresco-micro-${BUILD_NUMBER} amd64/postgres:9.4"
                         sleep 15
                         //Start application micro-services
-                        sh "docker run -d --name 'libreoffice-${BUILD_NUMBER}' ${REPO}:${COMMIT}-libreoffice"
-                        sh "docker run -d --name 'search-${BUILD_NUMBER}' ${REPO}:${COMMIT}-search"
-                        sh "docker run -d --name 'repository-${BUILD_NUMBER}' --link postgres-${BUILD_NUMBER}:postgres --link libreoffice-${BUILD_NUMBER}:libreoffice --link search-${BUILD_NUMBER}:search ${REPO}:${COMMIT}-repository"
-                        sh "docker run -d --name share-${BUILD_NUMBER} --link repository-${BUILD_NUMBER}:repository ${REPO}:${COMMIT}-share"
+                        sh "docker run -d --name 'libreoffice-${BUILD_NUMBER}' --network alfresco-micro-${BUILD_NUMBER} ${REPO}:${COMMIT}-libreoffice"
+                        sh "docker run -d --name 'search-${BUILD_NUMBER}' --network alfresco-micro-${BUILD_NUMBER} ${REPO}:${COMMIT}-search"
+                        sh "docker run -d --name 'repository-${BUILD_NUMBER}' --link postgres-${BUILD_NUMBER}:postgres --link libreoffice-${BUILD_NUMBER}:libreoffice --link search-${BUILD_NUMBER}:search --network alfresco-micro-${BUILD_NUMBER} ${REPO}:${COMMIT}-repository"
+                        sh "docker run -d --name share-${BUILD_NUMBER} --link repository-${BUILD_NUMBER}:repository --network alfresco-micro-${BUILD_NUMBER} ${REPO}:${COMMIT}-share"
                         // Get container IDs
                         script {
                             DOCKER_OOO    = sh(script: "docker ps -qa -f ancestor=${REPO}:${COMMIT}-libreoffice", returnStdout: true).trim()
@@ -206,7 +209,7 @@ pipeline {
                         sh "docker exec ${DOCKER_SEARCH} /bin/bash -c 'curl -i -X GET -u admin:admin http://${DOCKER_REPO}:8080/alfresco/service/api/audit/control'"
                         sh "docker exec ${DOCKER_SHA} /bin/bash -c 'curl -i -X GET -u admin:admin http://${DOCKER_SHA}:8080/alfresco/service/api/audit/control'"
                         // External
-                        sh "docker run --rm blitznote/debootstrap-amd64:17.04 bash -c 'curl -i -X GET -u admin:admin http://${DOCKER_SHA}:8080/share/page'"
+                        sh "docker run --rm --network alfresco-micro-${BUILD_NUMBER} blitznote/debootstrap-amd64:17.04 bash -c 'curl -i -X GET -u admin:admin http://${DOCKER_SHA}:8080/share/page'"
                     }
                     post {
                         always {
@@ -217,6 +220,7 @@ pipeline {
                             sh "docker rm -f repository-${BUILD_NUMBER}"
                             sh "docker rm -f search-${BUILD_NUMBER}"
                             sh "docker rm -f libreoffice-${BUILD_NUMBER}"
+                            sh "docker network rm -f alfresco-micro-${BUILD_NUMBER}"
                         }
                         success {
                             sh "docker login -u ${DOCKER_PRIVATE_USR} -p ${DOCKER_PRIVATE_PSW} ${PRIVATE_REGISTRY}"
