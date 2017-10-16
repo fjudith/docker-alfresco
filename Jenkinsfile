@@ -134,13 +134,13 @@ pipeline {
                 stage ('Slim'){
                     agent { label 'docker' }
                     steps {
-
+                        // Create Network
+                        sh "docker network create alfresco-slim-${BUILD_NUMBER}"
                         // Start database
-                        sh "docker run -d --name 'mysql-${BUILD_NUMBER}' -e MYSQL_ROOT_PASSWORD=alfresco -e MYSQL_USER=alfresco -e MYSQL_PASSWORD=alfresco -e MYSQL_DATABASE=alfresco amd64/mysql:5.6"
+                        sh "docker run -d --name 'mysql-${BUILD_NUMBER}' -e MYSQL_ROOT_PASSWORD=alfresco -e MYSQL_USER=alfresco -e MYSQL_PASSWORD=alfresco -e MYSQL_DATABASE=alfresco --network alfresco-slim-${BUILD_NUMBER} amd64/mysql:5.6"
                         sleep 15
-                        sh "docker logs mysql-${BUILD_NUMBER}"
                         // Start application
-                        sh "docker run -d --name 'alfresco-${BUILD_NUMBER}' --link mysql-${BUILD_NUMBER}:mysql ${REPO}:${COMMIT}"
+                        sh "docker run -d --name 'alfresco-${BUILD_NUMBER}' --link mysql-${BUILD_NUMBER}:mysql --network alfresco-slim-${BUILD_NUMBER} ${REPO}:${COMMIT}"
                         // Get container ID
                         script{
                             DOCKER_ALF    = sh(script: "docker ps -qa -f ancestor=${REPO}:${COMMIT}", returnStdout: true).trim()
@@ -180,13 +180,14 @@ pipeline {
                         // internal
                         sh "docker exec 'alfresco-${BUILD_NUMBER}' /bin/bash -c 'curl -i -X GET -u admin:admin http://localhost:8080/alfresco/service/api/audit/control'"
                         // External
-                        sh "docker run --rm blitznote/debootstrap-amd64:17.04 bash -c 'curl -i -X GET -u admin:admin http://${DOCKER_ALF}:8080/share/page'"
+                        sh "docker run --rm --network alfresco-slim-${BUILD_NUMBER} blitznote/debootstrap-amd64:17.04 bash -c 'curl -i -X GET -u admin:admin http://${DOCKER_ALF}:8080/share/page'"
                     }
                     post {
                         always {
                             echo 'Remove slim stack'
                             sh "docker rm -f mysql-${BUILD_NUMBER}"
                             sh "docker rm -f alfresco-${BUILD_NUMBER}"
+                            sh "docker network rm alfresco-slim-${BUILD_NUMBER}"
                         }
                         success {
                             sh "docker login -u ${DOCKER_PRIVATE_USR} -p ${DOCKER_PRIVATE_PSW} ${PRIVATE_REGISTRY}"
@@ -220,7 +221,7 @@ pipeline {
                             sh "docker rm -f repository-${BUILD_NUMBER}"
                             sh "docker rm -f search-${BUILD_NUMBER}"
                             sh "docker rm -f libreoffice-${BUILD_NUMBER}"
-                            sh "docker network rm -f alfresco-micro-${BUILD_NUMBER}"
+                            sh "docker network rm alfresco-micro-${BUILD_NUMBER}"
                         }
                         success {
                             sh "docker login -u ${DOCKER_PRIVATE_USR} -p ${DOCKER_PRIVATE_PSW} ${PRIVATE_REGISTRY}"
