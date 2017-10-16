@@ -140,6 +140,8 @@ pipeline {
                         sh "docker logs mysql-${BUILD_NUMBER}"
                         // Start application
                         sh "docker run -d --name 'alfresco-${BUILD_NUMBER}' --link mysql-${BUILD_NUMBER}:mysql ${REPO}:${COMMIT}"
+                        // Get container ID
+                        DOCKER_ALF    = sh(script: "docker ps -qa -f ancestor=${REPO}:${COMMIT}", returnStdout: true).trim()
                     }
                 }
                 stage ('Micro-Services'){
@@ -153,20 +155,12 @@ pipeline {
                         sh "docker run -d --name 'search-${BUILD_NUMBER}' ${REPO}:${COMMIT}-search"
                         sh "docker run -d --name 'repository-${BUILD_NUMBER}' --link postgres-${BUILD_NUMBER}:postgres --link libreoffice-${BUILD_NUMBER}:libreoffice --link search-${BUILD_NUMBER}:search ${REPO}:${COMMIT}-repository"
                         sh "docker run -d --name share-${BUILD_NUMBER} --link repository-${BUILD_NUMBER}:repository ${REPO}:${COMMIT}-share"
+                        // Get container IDs
+                        DOCKER_OOO    = sh(script: "docker ps -qa -f ancestor=${REPO}:${COMMIT}-libreoffice", returnStdout: true).trim()
+                        DOCKER_SEARCH = sh(script: "docker ps -qa -f ancestor=${REPO}:${COMMIT}-search", returnStdout: true).trim()
+                        DOCKER_REPO   = sh(script: "docker ps -qa -f ancestor=${REPO}:${COMMIT}-repository", returnStdout: true).trim()
+                        DOCKER_SHA    = sh(script: "docker ps -qa -f ancestor=${REPO}:${COMMIT}-share", returnStdout: true).trim()
                     }
-                }
-            }
-        }
-        stage ('Get container id') {
-            agent { label 'docker' }
-            steps {
-                script {
-                    sleep 180
-                    DOCKER_ALF    = sh(script: "docker ps -qa -f ancestor=${REPO}:${COMMIT}", returnStdout: true).trim()
-                    DOCKER_OOO    = sh(script: "docker ps -qa -f ancestor=${REPO}:${COMMIT}-libreoffice", returnStdout: true).trim()
-                    DOCKER_SEARCH = sh(script: "docker ps -qa -f ancestor=${REPO}:${COMMIT}-search", returnStdout: true).trim()
-                    DOCKER_REPO   = sh(script: "docker ps -qa -f ancestor=${REPO}:${COMMIT}-repository", returnStdout: true).trim()
-                    DOCKER_SHA    = sh(script: "docker ps -qa -f ancestor=${REPO}:${COMMIT}-share", returnStdout: true).trim()
                 }
             }
         }
@@ -175,7 +169,7 @@ pipeline {
                 stage ('Slim'){
                     agent { label 'docker' }
                     steps {
-                        
+                        sleep 180 
                         // internal
                         sh "docker exec 'alfresco-${BUILD_NUMBER}' /bin/bash -c 'curl -i -X GET -u admin:admin http://localhost:8080/alfresco/service/api/audit/control'"
                         // External
@@ -196,6 +190,7 @@ pipeline {
                 stage ('Micro-Services'){
                     agent { label 'docker'}
                     steps {
+                        sleep 180
                         // Internal
                         sh "docker exec libreoffice-${BUILD_NUMBER} /bin/bash -c 'nc -zv -w 5 localhost 8100'"
                         sh "docker exec search-${BUILD_NUMBER} /bin/bash -c 'curl -i -X GET http://localhost:8983/solr/admin/cores'"
