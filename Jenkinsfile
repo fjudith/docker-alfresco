@@ -187,7 +187,8 @@ pipeline {
                             sh "docker rm -f alfresco-${BUILD_NUMBER}"
                         }
                         success {
-
+                            sh "docker login -u ${DOCKER_PRIVATE_USR} -p ${DOCKER_PRIVATE_PSW} ${PRIVATE_REGISTRY}"
+                            sh "docker push ${PRIVATE_REPO}:${TAG}"
                         }
                     }
                 }
@@ -218,6 +219,13 @@ pipeline {
                             sh "docker rm -f search-${BUILD_NUMBER}"
                             sh "docker rm -f libreoffice-${BUILD_NUMBER}"
                         }
+                        success {
+                            sh "docker login -u ${DOCKER_PRIVATE_USR} -p ${DOCKER_PRIVATE_PSW} ${PRIVATE_REGISTRY}"
+                            sh "docker push ${PRIVATE_REPO}:${ALF_OOO}"
+                            sh "docker push ${PRIVATE_REPO}:${ALF_SEARCH}"
+                            sh "docker push ${PRIVATE_REPO}:${ALF_REPO}"
+                            sh "docker push ${PRIVATE_REPO}:${ALF_SHA}"
+                        }
                     }
                 }
             }
@@ -232,8 +240,7 @@ pipeline {
         }
         success {
             echo 'Only run if the current Pipeline has a "success" status, typically denoted in the web UI with a blue or green indication.'
-            sh "docker login -u ${DOCKER_PRIVATE_USR} -p ${DOCKER_PRIVATE_PSW} ${PRIVATE_REGISTRY}"
-            sh "docker push ${PRIVATE_REPO}"
+
         }
         unstable {
             echo 'Only run if the current Pipeline has an "unstable" status, usually caused by test failures, code violations, etc. Typically denoted in the web UI with a yellow indication.'
