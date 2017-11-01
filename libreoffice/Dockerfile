@@ -24,6 +24,7 @@ RUN apt-get update -yqq && \
         netcat \
         curl \
         fontconfig \
+        libglu1-mesa \
         libsm6 \
         libice6 \
         libxrender1 \

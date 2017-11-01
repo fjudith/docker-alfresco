@@ -42,7 +42,7 @@ Recommended approach is to point network share, especially in clustered environm
 | `/var/lib/alfresco/contentstore`         |                                                       |
 | `/var/lib/alfresco/contentstore.deleted` |                                                       |
 
-## Environmnet variables
+## Environment variables
 
 Below is the complete list of currently available parameters that can be set using environment variables.
 

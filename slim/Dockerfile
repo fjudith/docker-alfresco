@@ -18,8 +18,11 @@ RUN set -x && \
     apt-get update -yqq && \
     apt-get install --no-install-recommends -yqq \
         dnsutils \
+        procps \
         bash \
         patch \
+        libcairo2 \
+        libglu1-mesa \
         libcups2 \
         libfontconfig1 \
         libdbus-glib-1-2 \
