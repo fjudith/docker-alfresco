@@ -77,11 +77,11 @@ COPY assets/ldap-ad-authentication.properties ldap-ad/ldap1/ldap-ad-authenticati
 # Copy Markdown Preview Add-On.
 # https://github.com/cetra3/md-preview
 WORKDIR /alfresco/amps_share
-RUN curl https://github.com/fjudith/md-preview/releases/download/${MD_PREVIEW_VERSION}/parashift-mdpreview-share-${MD_PREVIEW_VERSION}.amp \
+RUN curl -L https://github.com/fjudith/md-preview/releases/download/${MD_PREVIEW_VERSION}/parashift-mdpreview-share-${MD_PREVIEW_VERSION}.amp \
     -o parashift-mdpreview-share-${MD_PREVIEW_VERSION}.amp
 
 WORKDIR /alfresco/amps/
-RUN curl https://github.com/fjudith/md-preview/releases/download/${MD_PREVIEW_VERSION}/parashift-mdpreview-repo-${MD_PREVIEW_VERSION}.amp \
+RUN curl -L https://github.com/fjudith/md-preview/releases/download/${MD_PREVIEW_VERSION}/parashift-mdpreview-repo-${MD_PREVIEW_VERSION}.amp \
     -o parashift-mdpreview-repo-${MD_PREVIEW_VERSION}.amp
 
 # install scripts
