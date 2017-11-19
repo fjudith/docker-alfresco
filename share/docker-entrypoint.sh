@@ -2,7 +2,7 @@
 ALFRESCO_HOST=${ALFRESCO_HOST:-repository}
 
 xmlstarlet ed  \
-    -P -S -L \
+    -L \
     -u '/alfresco-config/config[@evaluator="string-compare"]/remote/endpoint[id="alfresco-noauth"]/endpoint-url' \
     -v "http://${ALFRESCO_HOST}:8080/alfresco/s" \
     -u '/alfresco-config/config[@evaluator="string-compare"]/remote/endpoint[id="alfresco"]/endpoint-url' \
