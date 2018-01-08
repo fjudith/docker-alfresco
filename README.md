@@ -12,6 +12,13 @@
 [`201612`](https://github.com/fjudith/docker-alfresco/tree/201612)
 [`201605`](https://github.com/fjudith/docker-alfresco/tree/201605)
 
+**Micro service version**
+
+[`201707-libreoffice`, `libreoffice`](https://github.com/fjudith/docker-alfresco/tree/201707/libreoffice)
+[`201707-repository`, `repository`](https://github.com/fjudith/docker-alfresco/tree/201707/repository)
+[`201707-search`, `search`](https://github.com/fjudith/docker-alfresco/tree/201707/search)
+[`201707-share`, `share`](https://github.com/fjudith/docker-alfresco/tree/201707/share)
+
 ### Description
 
 Alfresco is a leading Enterprise Content Management system which provides document management, collaboration, web content services and records and knowledge management.
@@ -134,6 +141,7 @@ using environment variables.
 - **LDAP_SECURITY_CREDENTIALS**: default = `password`
 - **LDAP_GROUP_SEARCHBASE**: default = `cn=groups,cn=accounts,dc=example,dc=com`
 - **LDAP_USER_SEARCHBASE**: default = `cn=users,cn=accounts,dc=example,dc=com`
+- **LDAP_TIMEOUT**: LDAP server connection timeout (milliseconds); default = `5000`
 
 ##### Storage directory
 - **CONTENT_STORE**: location of content store; default = `${dir.root}` (/alfresco/alf_data)
