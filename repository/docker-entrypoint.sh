@@ -122,6 +122,7 @@ LDAP_SECURITY_PRINCIPAL=${LDAP_SECURITY_PRINCIPAL:-'uid=admin,cn=users,cn=accoun
 LDAP_SECURITY_CREDENTIALS=${LDAP_SECURITY_CREDENTIALS:-'password'}
 LDAP_GROUP_SEARCHBASE=${LDAP_GROUP_SEARCHBASE:-'cn=groups,cn=accounts,dc=example,dc=com'}
 LDAP_USER_SEARCHBASE=${LDAP_USER_SEARCHBASE:-'cn=users,cn=accounts,dc=example,dc=com'}
+LDAP_TIMEOUT=${LDAP_TIMEOUT:-5000}
 
 REVERSE_PROXY_URL=${REVERSE_PROXY_URL:-}
 
@@ -251,6 +252,7 @@ function tweak_alfresco {
     cfg_replace_option ldap.synchronization.java.naming.security.credentials $LDAP_SECURITY_CREDENTIALS $LDAP_CONFIG_FILE
     cfg_replace_option ldap.synchronization.groupSearchBase $LDAP_GROUP_SEARCHBASE $LDAP_CONFIG_FILE
     cfg_replace_option ldap.synchronization.userSearchBase $LDAP_USER_SEARCHBASE $LDAP_CONFIG_FILE
+    cfg_replace_option ldap.authentication.java.naming.read.timeout $LDAP_TIMEOUT $LDAP_CONFIG_FILE
   else
     cfg_replace_option authentication.chain "alfrescoNtlm1:alfrescoNtlm" $ALFRESCO_GLOBAL_PROPERTIES
   fi

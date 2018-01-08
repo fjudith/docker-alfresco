@@ -40,8 +40,6 @@ Recommended approach is to point network share, especially in clustered environm
 | Path                                     | Description                                           |
 | ---------------------------------------- | ----------------------------------------------------- |
 | `/var/lib/alfresco/alf_data`             |                                                       |
-| `/var/lib/alfresco/contentstore`         |                                                       |
-| `/var/lib/alfresco/contentstore.deleted` |                                                       |
 
 ## Environment variables
 
@@ -132,6 +130,8 @@ LDAP authentication is supported against most LDAP Controllers.
 | `LDAP_DEFAULT_ADMINS`       | comma separated list of alfresco admin names in ldap   | `admin` |
 | `LDAP_GROUP_SEARCHBASE`     | path to retreive the authentication granted groups     | `cn=groups,cn=accounts,dc=example,dc=com` |
 | `LDAP_USER_SEARCHBASE`      | path to retreive the authentication granted users      | `cn=users,cn=accounts,dc=example,dc=com`  |
+| `LDAP_USER_SEARCHBASE`      | path to retreive the authentication granted users      | `cn=users,cn=accounts,dc=example,dc=com`  |
+| `LDAP_TIMEOUT`              | ldap server connection timeout (milliseconds)          | `5000` |
 
 _**Active Directory**_
 
