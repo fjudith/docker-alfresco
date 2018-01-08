@@ -259,7 +259,7 @@ function tweak_alfresco {
   if [ "$LDAP_ENABLED" == "true" ]; then
     cfg_replace_option synchronization.synchronizeChangesOnly $SYNCHRONIZATION_SYNCHRONIZECHANGESONLY $ALFRESCO_GLOBAL_PROPERTIES
     cfg_replace_option synchronization.allowDeletions $SYNCHRONIZATION_ALLOWDELETIONS $ALFRESCO_GLOBAL_PROPERTIES
-    cfg_replace_option synchronization.import.cron $SYNCHRONIZATION_IMPORT_CRON $ALFRESCO_GLOBAL_PROPERTIES
+    cfg_replace_option synchronization.import.cron "$SYNCHRONIZATION_IMPORT_CRON" $ALFRESCO_GLOBAL_PROPERTIES
     cfg_replace_option synchronization.syncOnStartup $SYNCHRONIZATION_SYNCONSTARTUP $ALFRESCO_GLOBAL_PROPERTIES
     cfg_replace_option synchronization.syncWhenMissingPeopleLogIn $SYNCHRONIZATION_SYNCWHENMISSINGPEOPLELOGIN $ALFRESCO_GLOBAL_PROPERTIES
     cfg_replace_option synchronization.autoCreatePeopleOnLogin $SYNCHRONIZATION_AUTOCREATEPEOPLEONLOGIN $ALFRESCO_GLOBAL_PROPERTIES
