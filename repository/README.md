@@ -17,8 +17,9 @@ This image is aims to run the core platform component **Alfresco Content Reposit
 
 ## Roadmap
 
-* [ ] Implement option to disable CSRF
+* [x] Implement option to disable CSRF
 * [x] Support of LDAP authentication
+* [x] Support of LDAP sync configuration
 * [x] Support of Reverse-proxy configuration via environmnet variable
 * [x] Database connection autoconf when using `--link` (supported aliases _mysql_, _postgres_)
 * [x] Libreoffice connection using `--link` (supported alias _libreoffice_)
@@ -153,6 +154,19 @@ The following example applies to other LDAP Directories.
 | `LDAP_AUTH_USERNAMEFORMAT`  | user authentication pattern                            | `uid=%s,cn=users,cn=accounts,dc=example,dc=com` |
 | `LDAP_SECURITY_PRINCIPAL`   | user dedicated to query the LDAP directory             | `uid=admin,cn=users,cn=accounts,dc=example,dc=com` |
 | `LDAP_SECURITY_CREDENTIALS` | password of the LDAP query user                        | `password`   |
+
+### Synchronization
+
+LDAP Synchronisation is only enabled if LDAP Authentication configured.
+
+| Name                        | Description                                            | Default      |
+| --------------------------- | ------------------------------------------------------ | ------------ |
+| `SYNCHRONIZATION_SYNCHRONIZECHANGESONLY`     | Wether Full (false) or Differential (true) account synchronization    | `true`      |
+| `SYNCHRONIZATION_ALLOWDELETIONS`             | Delete user from Alfresco if deleted from directory    | `true` |
+| `SYNCHRONIZATION_IMPORT_CRON`                | Schedule of account synchronisation frequency   | `0 0/10 * * * *` (every 10 minutes) |
+| `SYNCHRONIZATION_SYNCONSTARTUP`              | Trigger account synchronisation on Alfresco startup     | `true` |
+| `SYNCHRONIZATION_SYNCWHENMISSINGPEOPLELOGIN` | Trigger a differential sync when a user, who does not yet exist, is successfully authenticated      | `true`  |
+| `SYNCHRONIZATION_AUTOCREATEPEOPLEONLOGIN`    | Create a user with default properties when a user is successfully authenticated      | `true`  |
 
 ### Content storage directories
 
