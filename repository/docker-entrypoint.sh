@@ -148,6 +148,8 @@ SYNCHRONIZATION_SYNCONSTARTUP=${SYNCHRONIZATION_SYNCONSTARTUP:-'true'}
 SYNCHRONIZATION_SYNCWHENMISSINGPEOPLELOGIN=${SYNCHRONIZATION_SYNCWHENMISSINGPEOPLELOGIN:-'true'}
 SYNCHRONIZATION_AUTOCREATEPEOPLEONLOGIN=${SYNCHRONIZATION_AUTOCREATEPEOPLEONLOGIN:-'true'}
 
+SMART_FOLDERS_ENABLED=${SMART_FOLDERS_ENABLED:-'false'} 
+
 function cfg_replace_option {
   grep "$1" "$3" > /dev/null
   if [ $? -eq 0 ]; then
@@ -277,6 +279,9 @@ function tweak_alfresco {
   # Binaries
   cfg_replace_option img.root "${IMG_ROOT}" $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option alfresco-pdf-renderer.root "${ALFRESCO_PDF_RENDERER_ROOT}" $ALFRESCO_GLOBAL_PROPERTIES
+
+  # smartfolder
+  cfg_replace_option smart.folders.enabled ${SMART_FOLDERS_ENABLED} $ALFRESCO_GLOBAL_PROPERTIES
 }
 
 function set_reverse_proxy {

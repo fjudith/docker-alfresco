@@ -238,6 +238,12 @@ Allows to access the repository using the NFS protocol.
 | `NFS_ENABLED`               | whether or not to enable CIFS                          | `false`      |
 | `NFS_PORT`                  | port of the FTP server                                 | `21`         |
 
+## SMART FOLDERS
+
+| Name                        | Description                                            | Default      |
+| --------------------------- | ------------------------------------------------------ | ------------ |
+| `SMART_FOLDERS_ENABLED`     | whether or not to enable [Smart Folders](https://docs.alfresco.com/5.2/concepts/sf-config-workflow.html) | `false`
+
 
 ### Build from Source
 

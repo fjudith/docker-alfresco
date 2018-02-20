@@ -132,6 +132,8 @@ REVERSE_PROXY_URL=${REVERSE_PROXY_URL:-}
 
 OOO_ENABLED=${OOO_ENABLED:-true}
 
+SMART_FOLDERS_ENABLED=${SMART_FOLDER_ENABLED:-'false'} 
+
 function cfg_replace_option {
   grep "$1" "$3" > /dev/null
   if [ $? -eq 0 ]; then
@@ -237,6 +239,9 @@ function tweak_alfresco {
   # content store
   cfg_replace_option dir.contentstore "${CONTENT_STORE}/contentstore" $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option dir.contentstore.deleted "${CONTENT_STORE}/contentstore.deleted" $ALFRESCO_GLOBAL_PROPERTIES
+
+  # smartfolder
+  cfg_replace_option smart.folders.enabled ${SMART_FOLDERS_ENABLED} $ALFRESCO_GLOBAL_PROPERTIES
 }
 
 function set_reverse_proxy {
