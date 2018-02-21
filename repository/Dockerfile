@@ -22,6 +22,7 @@ ENV AOS_MODULE_VERSION='1.1.6'
 ENV AIKAU_VERSION='1.0.102'
 ENV GOOGLE_DOCS_VERSION='3.0.4.2'
 ENV MD_PREVIEW_VERSION='1.3.0'
+ENV MANUAL_MANAGER_VERSION='1.0.0'
 
 RUN set -x && \
     apt-get update && \
@@ -87,7 +88,7 @@ RUN set -x && \
 
  # Deploy Alfresco Manual Manager in Tomcat
 WORKDIR ${CATALINA_HOME}/webapps/alfresco/WEB-INF/lib/
-RUN curl -L https://github.com/fjudith/manual-manager/releases/download/${MANUAL_MANAGER_VERSION}/loftux-manual-manager.jar \
+RUN curl -L https://github.com/fjudith/manual-manager/releases/download/v${MANUAL_MANAGER_VERSION}/loftux-manual-manager.jar \
     -o loftux-manual-manager.jar
 
 # Deploy Alfresco md-preview in Tomcat

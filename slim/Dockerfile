@@ -73,11 +73,11 @@ COPY assets/ldap-ad-authentication.properties ldap-ad/ldap1/ldap-ad-authenticati
 # Markdown manual editor and viewer
 # https://github.com/loftuxab/manual-manager
 WORKDIR /alfresco/tomcat/webapps/alfresco/WEB-INF/lib/
-RUN curl -L https://github.com/fjudith/manual-manager/releases/download/${MANUAL_MANAGER_VERSION}/loftux-manual-manager.jar \
+RUN curl -L https://github.com/fjudith/manual-manager/releases/download/v${MANUAL_MANAGER_VERSION}/loftux-manual-manager.jar \
     -o loftux-manual-manager.jar
 
 WORKDIR /alfresco/tomcat/webapps/share/WEB-INF/lib/
-RUN curl -L https://github.com/fjudith/manual-manager/releases/download/${MANUAL_MANAGER_VERSION}/loftux-manual-manager.jar \
+RUN curl -L https://github.com/fjudith/manual-manager/releases/download/v${MANUAL_MANAGER_VERSION}/loftux-manual-manager.jar \
     -o loftux-manual-manager.jar
 
 # Copy Markdown Preview Add-On.
