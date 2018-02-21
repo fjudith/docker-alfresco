@@ -57,6 +57,11 @@ RUN set -x && \
     java -jar /root/alfresco-mmt.jar install /root/amp/ webapps/share -nobackup -directory && \
     rm /root/amp/alfresco-googledocs-share-${GOOGLE_DOCS_VERSION}.amp
 
+# Deploy Alfresco Manual Manager
+WORKDIR ${CATALINA_HOME}/webapps/share/WEB-INF/lib/
+RUN curl -L https://github.com/fjudith/manual-manager/releases/download/${MANUAL_MANAGER_VERSION}/loftux-manual-manager.jar \
+    -o loftux-manual-manager.jar
+
 # Deploy Alfresco md-preview in Tomcat
 WORKDIR /root/amp/
 RUN curl -L https://github.com/fjudith/md-preview/releases/download/${MD_PREVIEW_VERSION}/parashift-mdpreview-share-${MD_PREVIEW_VERSION}.amp \

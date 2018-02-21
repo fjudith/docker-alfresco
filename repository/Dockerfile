@@ -85,6 +85,10 @@ RUN set -x && \
     java -jar /root/alfresco-mmt.jar install /root/amp/ webapps/alfresco -nobackup -directory && \
     rm /root/amp/alfresco-googledocs-repo-${GOOGLE_DOCS_VERSION}.amp
 
+ # Deploy Alfresco Manual Manager in Tomcat
+WORKDIR ${CATALINA_HOME}/webapps/alfresco/WEB-INF/lib/
+RUN curl -L https://github.com/fjudith/manual-manager/releases/download/${MANUAL_MANAGER_VERSION}/loftux-manual-manager.jar \
+    -o loftux-manual-manager.jar
 
 # Deploy Alfresco md-preview in Tomcat
 WORKDIR /root/amp/
