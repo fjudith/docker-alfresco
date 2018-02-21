@@ -42,7 +42,8 @@ pipeline {
                             branch: 'master'
                         sh 'tree -sh'
                         sh 'ant package'
-                        ArchiveArtifacts artifacts:'build/dist/**/**.jar', fingerprint: true
+                        archive name: 'manual-manager',
+                            includes: 'build/dist/**/**.jar'
                         // stash name: 'manual-manager',
                         //   includes: 'build/dist/**'
                     }
@@ -60,7 +61,8 @@ pipeline {
                         sh 'tree -sh'
                         sh 'cd share/ && gradle amp && cd ../'
                         sh 'cd repo/ && gradle amp && cd ../'
-                        ArchiveArtifacs artifacts: 'repo/build/amp/**,share/build/amp/**', fingerprint: true
+                        archive name: 'md-preview', 
+                            includes: 'repo/build/amp/**,share/build/amp/**'
                         // stash name: 'md-preview',
                         //    includes: 'repo/build/amp/**,share/build/amp/**'
                     }
