@@ -42,8 +42,7 @@ pipeline {
                             branch: 'master'
                         sh 'tree -sh'
                         sh 'ant package'
-                        archive name: 'manual-manager',
-                            includes: 'build/dist/**/**.jar'
+                        archive 'build/dist/**/**.jar'
                         // stash name: 'manual-manager',
                         //   includes: 'build/dist/**'
                     }
@@ -61,8 +60,7 @@ pipeline {
                         sh 'tree -sh'
                         sh 'cd share/ && gradle amp && cd ../'
                         sh 'cd repo/ && gradle amp && cd ../'
-                        archive name: 'md-preview', 
-                            includes: 'repo/build/amp/**,share/build/amp/**'
+                        archive 'repo/build/amp/**,share/build/amp/**'
                         // stash name: 'md-preview',
                         //    includes: 'repo/build/amp/**,share/build/amp/**'
                     }
