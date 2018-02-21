@@ -42,8 +42,9 @@ pipeline {
                             branch: 'master'
                         sh 'tree -sh'
                         sh 'ant package'
-                        stash name: 'manual-manager',
-                            includes: 'build/dist/**'
+                        ArchiveArtifacts artifacts:'build/dist/**/**.jar', fingerprint: true
+                        // stash name: 'manual-manager',
+                        //   includes: 'build/dist/**'
                     }
                 }
                 stage ("Build Markdown Preview add-on"){
@@ -59,8 +60,9 @@ pipeline {
                         sh 'tree -sh'
                         sh 'cd share/ && gradle amp && cd ../'
                         sh 'cd repo/ && gradle amp && cd ../'
-                        stash name: 'md-preview',
-                            includes: 'repo/build/amp/**,share/build/amp/**'
+                        ArchiveArtifacs artifacts: 'repo/build/amp/**,share/build/amp/**', fingerprint: true
+                        // stash name: 'md-preview',
+                        //    includes: 'repo/build/amp/**,share/build/amp/**'
                     }
                 }
             }
