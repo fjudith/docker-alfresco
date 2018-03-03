@@ -1,6 +1,9 @@
 [![](https://images.microbadger.com/badges/image/fjudith/alfresco.svg)](https://microbadger.com/images/fjudith/alfresco "Get your own image badge on microbadger.com")
 [![Build Status](https://travis-ci.org/fjudith/docker-alfresco.svg?branch=master)](https://travis-ci.org/fjudith/docker-alfresco)
 
+
+![high level architecture](https://raw.githubusercontent.com/fjudith/docker-alfresco/201707/alfresco_architecture.png)
+
 # Supported tags and respective Dockerfile links
 
 [`201707`, `slim`, `latest`](https://github.com/fjudith/docker-alfresco/tree/201707)
