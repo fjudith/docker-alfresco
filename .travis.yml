@@ -37,6 +37,12 @@ script:
   - DOCKER_SEARCH=`docker ps -qa -f ancestor=${REG}:search`
   - DOCKER_SHA=`docker ps -qa -f ancestor=${REG}:share`
   - DOCKER_ALF=`docker ps -qa -f ancestor=${REG}:${COMMIT}`
+  # Show logs
+  - docker logs $DOCKER_REPO
+  - docker logs $DOCKER_OOO
+  - docker logs $DOCKER_SEARCH
+  - docker logs $DOCKER_SHA
+  - docker logs $DOCKER_ALF
   # -i, --include – include protocol headers in the output (H/F)
   # -X, --request – specify request  COMMAND (GET, PUT, DELETE…)  to use
   - docker exec ${DOCKER_ALF} /bin/bash -c "curl -i -X GET -u admin:admin http://localhost:8080/alfresco/service/api/audit/control"
