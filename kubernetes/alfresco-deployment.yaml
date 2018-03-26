@@ -9,7 +9,7 @@ metadata:
     app: alfresco
     tiers: database
 spec:
-  type: Cluster-IP
+  type: ClusterIP
   ports:
   - name: postgres
     port: 5432
@@ -112,7 +112,7 @@ metadata:
     app: alfresco
     tiers: search
 spec:
-  type: Cluster-IP
+  type: ClusterIP
   ports:
   - name: solr-http
     port: 8983
@@ -225,7 +225,7 @@ metadata:
     app: alfresco
     tiers: converter
 spec:
-  type: Cluster-IP
+  type: ClusterIP
   ports:
   - name: libreoffice
     port: 8100
@@ -234,7 +234,7 @@ spec:
   selector:
     app: alfresco
     tiers: converter
-  type: Cluster-IP
+  type: ClusterIP
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -271,7 +271,7 @@ metadata:
     app: alfresco
     tiers: engine
 spec:
-  type: Cluster-IP
+  type: ClusterIP
   ports:
   - name: netbios-ns
     port: 137
@@ -483,24 +483,3 @@ spec:
           initialDelaySeconds: 30
           timeoutSeconds: 30
 ---
-##########################################################################
-# Ingress resource (gateway)
-##########################################################################
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: gateway
-  annotations:
-    kubernetes.io/ingress.class: "istio"
-spec:
-  rules:
-  - http:
-      paths:
-      - path: /share
-        backend:
-          serviceName: share
-          servicePort: 8080
-      - path: /alfresco
-        backend:
-          serviceName: alfresco
-          servicePort: 8080
