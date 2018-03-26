@@ -12,14 +12,14 @@ done
 
 # Create
 if [ -z create ] ; then
-  tr --delete '\n' <password.txt >.strippedpassword.txt && mv .strippedpassword.txt alfresco.postgres.password.txt
+  tr --delete '\n' <alfresco.postgres.password.txt >.strippedpassword.txt && mv .strippedpassword.txt alfresco.postgres.password.txt
   kubectl create secret generic alfresco-pass --from-file=alfresco.postgres.password.txt
   kubectl apply -f ./local-volumes.yaml
   kubectl apply -f ./alfresco-deployment.yaml
 
   kubectl get svc share -n default
 elif [ -v create ] && [ "$create" == "conduit" ]; then
-  tr --delete '\n' <password.txt >.strippedpassword.txt && mv .strippedpassword.txt alfresco.postgres.password.txt
+  tr --delete '\n' <alfresco.postgres.password.txt >.strippedpassword.txt && mv .strippedpassword.txt alfresco.postgres.password.txt
   kubectl create secret generic alfresco-pass --from-file=alfresco.postgres.password.txt
   kubectl apply -f ./local-volumes.yaml
   cat ./alfresco-deployment.yaml | conduit inject --skip-outbound-ports=5432,8100 --skip-inbound-ports=5432,8100 - | kubectl apply -f -
@@ -31,7 +31,7 @@ elif [ -v create ] && [ "$create" == "istio" ]; then
   kubectl create namespace alfresco
   kubectl label namespace alfresco istio-injection=enabled
 
-  tr --delete '\n' <password.txt >.strippedpassword.txt && mv .strippedpassword.txt alfresco.postgres.password.txt
+  tr --delete '\n' <alfresco.postgres.password.txt >.strippedpassword.txt && mv .strippedpassword.txt alfresco.postgres.password.txt
   kubectl create secret generic -n alfresco alfresco-pass --from-file=alfresco.postgres.password.txt
   kubectl apply -f ./local-volumes.yaml
   kubectl apply -n alfresco -f ./alfresco-deployment.yaml

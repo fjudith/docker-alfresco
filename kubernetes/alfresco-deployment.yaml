@@ -71,7 +71,7 @@ spec:
         tiers: database
     spec:
       containers:
-      - image: postgres
+      - image: amd64/postgres:9.4
         name: postgres
         env:
         - name: POSTGRES_DB
@@ -359,6 +359,18 @@ spec:
       - image: fjudith/alfresco:repository
         name: alfresco
         env: 
+        - name: ALFRESCO_HOSTNAME
+          value: docs.example.com
+        - name: ALFRESCO_PROTOCOL
+          value: http
+        - name: ALFRESCO_PORT
+          value: 8080
+        - name: SHARE_HOSTNAME
+          value: docs.example.com
+        - name: SHARE_PROTOCOL
+          value: http
+        - name: SHARE_PORT
+          value: 8080
         - name: DB_KIND
           value: postgresql
         - name: DB_HOST
