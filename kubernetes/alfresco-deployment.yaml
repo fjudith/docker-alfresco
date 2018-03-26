@@ -4,13 +4,14 @@
 apiVersion: v1
 kind: Service
 metadata:
+  name: postgres
   labels:
     app: alfresco
     tiers: database
-  name: postgres
 spec:
+  type: Cluster-IP
   ports:
-  - name: posgressql2
+  - name: postgres
     port: 5432
     targetPort: 5432
     protocol: TCP
@@ -106,11 +107,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  name: search
   labels:
     app: alfresco
     tiers: search
-  name: search
 spec:
+  type: Cluster-IP
   ports:
   - name: solr-http
     port: 8983
@@ -192,7 +194,7 @@ spec:
       - image: fjudith/alfresco:search
         name: search
         ports:
-        - containerPort: 8380
+        - containerPort: 8983
           name: solr-http
         volumeMounts:
         - name: alfresco-search-alfresco
@@ -218,11 +220,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  name: libreoffice
   labels:
     app: alfresco
     tiers: converter
-  name: libreoffice
 spec:
+  type: Cluster-IP
   ports:
   - name: libreoffice
     port: 8100
@@ -231,6 +234,7 @@ spec:
   selector:
     app: alfresco
     tiers: converter
+  type: Cluster-IP
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -262,11 +266,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  name: repository
   labels:
     app: alfresco
-    tiers: repository
-  name: alfresco
+    tiers: engine
 spec:
+  type: Cluster-IP
   ports:
   - name: netbios-ns
     port: 137
@@ -378,7 +383,7 @@ spec:
         - name: SOLR_INDEX_SUBSYSTEM
           value: "solr6"
         - name: SOLR_HOST
-          value: "solr"
+          value: "search"
         - name: SOLR_PORT
           value: "8983"
         ports:
@@ -422,11 +427,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  name: share
   labels:
     app: alfresco
     tiers: frontend
-  name: share
 spec:
+  type: LoadBalancer
   ports:
   - name: http
     port: 8080

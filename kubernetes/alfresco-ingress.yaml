@@ -1,0 +1,21 @@
+##########################################################################
+# Ingress resource (gateway)
+##########################################################################
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: gateway
+  annotations:
+    kubernetes.io/ingress.class: "istio"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /share
+        backend:
+          serviceName: share
+          servicePort: 8080
+      - path: /alfresco
+        backend:
+          serviceName: alfresco
+          servicePort: 8080
