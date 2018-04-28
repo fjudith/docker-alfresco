@@ -55,7 +55,7 @@ script:
   - docker exec ${DOCKER_REPO} /bin/bash -c "curl -i -X GET http://${DOCKER_SEARCH}:8983/solr/admin/cores"
   - docker exec ${DOCKER_SEARCH} /bin/bash -c "curl -i -X GET -u admin:admin http://${DOCKER_REPO}:8080/alfresco/service/api/audit/control"
   - docker exec ${DOCKER_SHA} /bin/bash -c "curl -i -X GET -u admin:admin http://${DOCKER_REPO}:8080/alfresco/service/api/audit/control"
-  - curl -iL -X GET -u admin:admin http://localhost:8080/share/page
+  - curl -iL -X GET -u admin:admin http://localhost:58080/share/page
   - curl -iL -X GET -u admin:admin http://localhost:32732/share/page
 
 
