@@ -5,6 +5,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: postgres
+  namespace: alfresco
   labels:
     app: alfresco
     tiers: database
@@ -19,44 +20,11 @@ spec:
     app: alfresco
     tiers: database
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: alfresco-db
-  labels:
-    app: alfresco
-spec:
-  accessModes:
-  - ReadWriteMany
-  resources:
-    requests:
-      storage: 512Mi
-  selector:
-    matchLabels:
-      app: alfresco
-      tiers: database
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: alfresco-dblog
-  labels:
-    app: alfresco
-spec:
-  accessModes:
-  - ReadWriteMany
-  resources:
-    requests:
-      storage: 512Mi
-  selector:
-    matchLabels:
-      app: alfresco
-      tiers: database
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgres
+  namespace: alfresco
 spec:
   replicas: 1
   selector:
@@ -108,6 +76,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: search
+  namespace: alfresco
   labels:
     app: alfresco
     tiers: search
@@ -122,61 +91,11 @@ spec:
     app: alfresco
     tiers: search
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  labels:
-    app: alfresco
-  name: alfresco-search-alfresco
-spec:
-  accessModes:
-  - ReadWriteMany
-  resources:
-    requests:
-      storage: 512Mi
-  selector:
-    matchLabels:
-      app: alfresco
-      tiers: search
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  labels:
-    app: alfresco
-  name: alfresco-search-archive
-spec:
-  accessModes:
-  - ReadWriteMany
-  resources:
-    requests:
-      storage: 512Mi
-  selector:
-    matchLabels:
-      app: alfresco
-      tiers: search
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  labels:
-    app: alfresco
-  name: alfresco-search-contentstore
-spec:
-  accessModes:
-  - ReadWriteMany
-  resources:
-    requests:
-      storage: 512Mi
-  selector:
-    matchLabels:
-      app: alfresco
-      tiers: search
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: search
+  namespace: alfresco
 spec:
   replicas: 1
   selector:
@@ -221,6 +140,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: libreoffice
+  namespace: alfresco
   labels:
     app: alfresco
     tiers: converter
@@ -240,6 +160,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: libreoffice
+  namespace: alfresco
 spec:
   replicas: 1
   selector:
@@ -267,6 +188,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: repository
+  namespace: alfresco
   labels:
     app: alfresco
     tiers: engine
@@ -301,44 +223,11 @@ spec:
     app: alfresco
     tiers: engine
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  labels:
-    app: alfresco
-  name: alfresco-data
-spec:
-  accessModes:
-  - ReadWriteMany
-  resources:
-    requests:
-      storage: 512Mi
-  selector:
-    matchLabels:
-      app: alfresco
-      tiers: engine
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  labels:
-    app: alfresco
-  name: alfresco-log
-spec:
-  accessModes:
-  - ReadWriteMany
-  resources:
-    requests:
-      storage: 512Mi
-  selector:
-    matchLabels:
-      app: alfresco
-      tiers: engine
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: repository
+  namespace: alfresco
   labels:
     app: alfresco
     tiers: engine
@@ -440,6 +329,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: share
+  namespace: alfresco
   labels:
     app: alfresco
     tiers: frontend
@@ -458,6 +348,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: share
+  namespace: alfresco
   labels:
     app: alfresco
     tiers: frontend
@@ -495,3 +386,25 @@ spec:
           initialDelaySeconds: 30
           timeoutSeconds: 30
 ---
+##########################################################################
+# Ingress resource (gateway)
+##########################################################################
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: gateway
+  namespace: alfresco
+  annotations:
+    kubernetes.io/ingress.class: "istio"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /share
+        backend:
+          serviceName: share
+          servicePort: 8080
+      - path: /alfresco
+        backend:
+          serviceName: alfresco
+          servicePort: 8080

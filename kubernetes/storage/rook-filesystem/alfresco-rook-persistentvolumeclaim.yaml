@@ -1,0 +1,140 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: alfresco-db
+  namespace: alfresco
+  labels:
+    app: alfresco
+spec:
+  storageClassName: rook-filesystem-simple
+  path: /alfresco-db
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+  selector:
+    matchLabels:
+      app: alfresco
+      tiers: database
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: alfresco-dblog
+  namespace: alfresco
+  labels:
+    app: alfresco
+spec:
+  storageClassName: rook-filesystem-simple
+  path: /alfresco-db-log
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+  selector:
+    matchLabels:
+      app: alfresco
+      tiers: database
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: alfresco
+    namespace: alfresco
+  name: alfresco-search-alfresco
+spec:
+  storageClassName: rook-filesystem-simple
+  path: /alfresco-search-alfresco
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+  selector:
+    matchLabels:
+      app: alfresco
+      tiers: search
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: alfresco
+    namespace: alfresco
+  name: alfresco-search-archive
+spec:
+  storageClassName: rook-filesystem-simple
+  path: /alfresco-search-archive
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+  selector:
+    matchLabels:
+      app: alfresco
+      tiers: search
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: alfresco
+    namespace: alfresco
+  name: alfresco-search-contentstore
+spec:
+  storageClassName: rook-filesystem-simple
+  path: /alfresco-search-contentstore
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+  selector:
+    matchLabels:
+      app: alfresco
+      tiers: search
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: alfresco
+    namespace: alfresco
+  name: alfresco-data
+spec:
+  storageClassName: rook-filesystem-simple
+  path: /alfresco-data
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+  selector:
+    matchLabels:
+      app: alfresco
+      tiers: engine
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: alfresco
+    namespace: alfresco
+  name: alfresco-log
+spec:
+  storageClassName: rook-filesystem-simple
+  path: /alfresco-log
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+  selector:
+    matchLabels:
+      app: alfresco
+      tiers: engine
+---
