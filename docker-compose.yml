@@ -70,6 +70,6 @@ services:
     build: share/
     image: fjudith/alfresco:share
     ports:
-      - "8080:8080"
+      - "58080:8080"
     links:
       - repository:repository
