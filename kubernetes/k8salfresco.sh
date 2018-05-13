@@ -16,7 +16,7 @@ if [ -z create ] ; then
   tr --delete '\n' <alfresco.postgres.password.txt >.strippedpassword.txt && mv .strippedpassword.txt alfresco.postgres.password.txt
   kubectl --namespace alfresco create secret generic alfresco-pass --from-file=alfresco.postgres.password.txt
   
-  kubectl apply -f ./local-volumes.yaml
+  kubectl apply -f storage/hostpath/local-volumes.yaml
   
   kubectl --namespace alfresco apply -f ./alfresco-deployment.yaml
 
@@ -28,7 +28,7 @@ elif [ -v create ] && [ "$create" == "conduit" ]; then
   tr --delete '\n' <alfresco.postgres.password.txt >.strippedpassword.txt && mv .strippedpassword.txt alfresco.postgres.password.txt
   kubectl --namespace alfresco create secret generic alfresco-pass --from-file=alfresco.postgres.password.txt
   
-  kubectl apply -f ./local-volumes.yaml
+  kubectl apply -f storage/hostpath/local-volumes.yaml
   
   cat ./alfresco-deployment.yaml | conduit inject --skip-outbound-ports=5432,8100 --skip-inbound-ports=5432,8100 - | kubectl --namespace alfresco apply -f -
 
@@ -43,7 +43,7 @@ elif [ -v create ] && [ "$create" == "istio" ]; then
   tr --delete '\n' <alfresco.postgres.password.txt >.strippedpassword.txt && mv .strippedpassword.txt alfresco.postgres.password.txt
   kubectl --namespace alfresco create secret generic alfresco-pass --from-file=alfresco.postgres.password.txt
   
-  kubectl apply -f ./local-volumes.yaml
+  kubectl apply -f storage/hostpath/local-volumes.yaml
   
   kubectl --namespace alfresco apply -f ./alfresco-deployment.yaml
   
@@ -57,13 +57,13 @@ fi
 
 # Delete
 if [ -z delete ] || [ "$delete" == "conduit" ]; then
-  kubectl delete -f ./local-volumes.yaml
+  kubectl delete -f storage/hostpath/local-volumes.yaml
 
   kubectl delete namespace alfresco
 fi
 
 if [ -v delete ] && [ "$delete" == "istio" ]; then
-  kubectl delete -f ./local-volumes.yaml
+  kubectl delete -f storage/hostpath/local-volumes.yaml
 
   kubectl delete namespace alfresco
 fi
