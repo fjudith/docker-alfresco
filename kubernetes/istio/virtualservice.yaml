@@ -1,0 +1,28 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: alfresco
+  namespace: default
+spec:
+  gateways:
+  - istio-gateway
+  hosts:
+  - 'docs.example.com'
+  http:
+  - match:
+    - uri:
+        prefix: /share
+    route:
+    - destination:
+        host: share.alfresco.svc.cluster.local
+        port:
+          number: 8080
+  - match:
+    - uri:
+        prefix: /alfresco
+    route:
+    - destination:
+        host: repository.alfresco.svc.cluster.local
+        port:
+          number: 8080
+---
