@@ -315,6 +315,10 @@ spec:
           tcpSocket:
             port: 8080
           timeoutSeconds: 5
+      initContainers:
+      - name: init-postgres
+        image: busybox
+        command: ['sh', '-c', 'until nc -zv -w 5 postgres 5432; do echo waiting for postgres; sleep 2; done;']
       volumes:
       - name: alfresco-data
         persistentVolumeClaim:
