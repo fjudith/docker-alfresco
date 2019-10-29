@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: share
+  namespace: alfresco
+  labels:
+    app: alfresco
+    tiers: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alfresco
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: alfresco
+        tiers: frontend
+    spec:
+      containers:
+      - image: fjudith/alfresco:share
+        name: share
+        env:
+        - name: ALFRESCO_HOST
+          value: repository
+        - name: ALFRESCO_PORT
+          value: "8080"
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        - containerPort: 8443
+          name: https
+          protocol: TCP
+        livenessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 30
+          timeoutSeconds: 30
+---

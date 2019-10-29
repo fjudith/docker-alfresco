@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: alfresco
+  labels:
+    app: alfresco
+    tiers: database
+    version: v201707
+spec:
+  serviceName: alfresco-postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alfresco
+      tiers: database
+      version: v201707
+  template:
+    metadata:
+      labels:
+        app: alfresco
+        tiers: database
+        version: v201707
+    spec:
+      containers:
+      - image: amd64/postgres:9.4
+        name: postgres
+        imagePullPolicy: Always
+        resources:
+          # need more cpu upon initialization, therefore burstable class
+          limits:
+            cpu: 1000m
+          requests:
+            cpu: 100m
+        ports:
+        - containerPort: 5432
+          name: postgres
+        env:
+        - name: POSTGRES_DB
+          value: alfresco
+        - name: POSTGRES_USER
+          value: alfresco
+        # $ kubectl create secret generic postgres-pass --from-file=alfresco.postgres.password.txt
+        # make sure postgres.password.txt does not have a trailing newline
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: alfresco-pass
+              key: alfresco.postgres.password.txt
+        volumeMounts:
+        - name: alfresco-db
+          mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: alfresco-db
+      spec:
+        accessModes: [ "ReadWriteMany"]
+        storageClassName: 'rook-ceph-block'
+        resources:
+          requests:
+            storage: 10Gi
+---

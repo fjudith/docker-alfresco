@@ -1,27 +1,12 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: alfresco-db
-  namespace: alfresco
-  labels:
-    app: alfresco
-spec:
-  storageClassName: rook-ceph-block
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
   name: alfresco-search-alfresco
   namespace: alfresco
   labels:
     app: alfresco
 spec:
-  storageClassName: rook-ceph-block
+  # storageClassName: ''
   accessModes:
   - ReadWriteOnce
   resources:
@@ -36,7 +21,7 @@ metadata:
   labels:
     app: alfresco
 spec:
-  storageClassName: rook-ceph-block
+  # storageClassName: ''
   accessModes:
   - ReadWriteOnce
   resources:
@@ -51,22 +36,7 @@ metadata:
   labels:
     app: alfresco
 spec:
-  storageClassName: rook-ceph-block
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: alfresco-data
-  namespace: alfresco
-  labels:
-    app: alfresco
-spec:
-  storageClassName: rook-ceph-block
+  # storageClassName: ''
   accessModes:
   - ReadWriteOnce
   resources:

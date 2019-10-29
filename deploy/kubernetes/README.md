@@ -22,12 +22,12 @@ Put your desired PostgreSQL in file called `alfresco.postgres.password.txt` with
 # 
 
 # PostgreSQL and alfresco persistent volumes
-kubectl create -f https://raw.githubusercontent.com/fjudith/docker-alfresco/master/kubernetes/alfresco-pv.yaml
+kubectl create -f https://raw.githubusercontent.com/fjudith/docker-alfresco/deploy/master/kubernetes/alfresco-pv.yaml
 
 # PostgreSQL and Alfresco with persistent volumes and secret file
 tr --delete '\n' <alfresco.postgres.password.txt >.strippedpassword.txt && mv .strippedpassword.txt alfresco.postgres.password.txt
 kubectl create secret generic alfresco-pass --from-file=alfresco.postgres.password.txt
-kubectl create -f https://raw.githubusercontent.com/fjudith/docker-alfresco/master/kubernetes/alfresco-dp.yaml
+kubectl create -f https://raw.githubusercontent.com/fjudith/docker-alfresco/deploy/master/kubernetes/alfresco-dp.yaml
 ```
 
 ## Cluster Requirements
@@ -84,7 +84,7 @@ sudo mkdir -p \
 sudo chcon -Rt svirt_sandbox_file_t /var/lib/kubernetes/pv
 ```
 
-Continuing with host path, create the persistent volume objects in Kubernetes using [alfresco-pv.yaml](https://github.com/fjudith/docker-alfresco/tree/master/kubernetes/alfresco-pv.yaml):
+Continuing with host path, create the persistent volume objects in Kubernetes using [alfresco-pv.yaml](https://github.com/fjudith/docker-alfresco/tree/deploy/master/kubernetes/alfresco-pv.yaml):
 
 ```bash
 export KUBE_REPO=https://raw.githubusercontent.com/fjudith/docker-alfresco/master/kubernetes
@@ -128,12 +128,12 @@ The Alfresco password is not referenced by the Alfresco pod configuration as it 
 
 ## Deploy PostgreSQL and Alfresco
 
-Now that the persistent disks and secrets are defined, the Kubernetes pods can be launched. Start PostgresSQL using [alfresco-dp.yaml](https://github.com/fjudith/docker-alfresco/tree/master/kubernetes/cephfs/alfresco-dp.yaml).
+Now that the persistent disks and secrets are defined, the Kubernetes pods can be launched. Start PostgresSQL using [alfresco-dp.yaml](https://github.com/fjudith/docker-alfresco/tree/deploy/master/kubernetes/cephfs/alfresco-dp.yaml).
 
 ```bash
 kubectl create -f $KUBE_REPO/alfresco-dp.yaml
 ```
-Take a look at [alfresco-dp.yaml](https://github.com/fjudith/docker-alfresco/tree/master/kubernetes/alfresco-dp.yaml), and note that we've defined four volumes mounts for:
+Take a look at [alfresco-dp.yaml](https://github.com/fjudith/docker-alfresco/tree/deploy/master/kubernetes/alfresco-dp.yaml), and note that we've defined four volumes mounts for:
 
 For `alfresco-pg`
 
@@ -177,7 +177,7 @@ LOG:  database system is ready to accept connections
 LOG:  autovacuum launcher started
 ```
 
-Also in [alfresco-dp.yaml](https://github.com/fjudith/docker-alfresco/tree/master/kubernetes/alfresco-dp.yaml) we created a service to allow ofther pods to reach this postgres instance. the name is `alfresco-pg` which resolves to the pod IP.
+Also in [alfresco-dp.yaml](https://github.com/fjudith/docker-alfresco/tree/deploy/master/kubernetes/alfresco-dp.yaml) we created a service to allow ofther pods to reach this postgres instance. the name is `alfresco-pg` which resolves to the pod IP.
 
 Up to this point two Deployment, two Pod, four PVC, two Service, two Endpoint, four PVs, and one Secrets have been created, shown below:
 

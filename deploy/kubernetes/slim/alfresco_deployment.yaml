@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alfresco
+  namespace: alfresco
+  labels:
+    app: alfresco
+    tiers: demo
+    version: '201707'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alfresco
+      tiers: demo
+      version: '201707'
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: alfresco
+        tiers: demo
+        version: '201707'
+    spec:
+      containers:
+      - image: docker.io/fjudith/alfresco:201707
+        name: alfresco
+        env: 
+        - name: REVERSE_PROXY_URL
+          value: https://docs.example.com
+        - name: ALFRESCO_HOSTNAME
+          value: docs.example.com
+        - name: ALFRESCO_PROTOCOL
+          value: http
+        - name: ALFRESCO_PORT
+          value: "8080"
+        - name: SHARE_HOSTNAME
+          value: docs.example.com
+        - name: SHARE_PROTOCOL
+          value: http
+        - name: SHARE_PORT
+          value: "8080"
+        - name: DB_KIND
+          value: postgresql
+        - name: DB_HOST
+          value: postgres
+        - name: DB_NAME
+          value: alfresco
+        - name: DB_USERNAME
+          value: alfresco
+        # $ kubectl create secret generic postgres-pass --from-file=alfresco.postgres.password.txt
+        # make sure postgres.password.txt does not have a trailing newline
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: alfresco-pass
+              key: alfresco.postgres.password.txt
+        ports:
+        - containerPort: 137
+          name: netbios-ns
+        - containerPort: 138
+          name: netbios-dgm
+        - containerPort: 139
+          name: netbios-ssn
+        - containerPort: 21
+          name: ftp
+        - containerPort: 445
+          name: microsoft-ds
+        - containerPort: 8080
+          name: http-proxy
+        volumeMounts:
+        - name: alfresco-data
+          mountPath: /var/lib/alfresco/alf_data
+        - name: alfresco-log
+          mountPath: /usr/share/tomcat/logs
+        livenessProbe:
+          tcpSocket:
+              port: 8080
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          timeoutSeconds: 5
+      volumes:
+      - name: alfresco-data
+        persistentVolumeClaim:
+          claimName: alfresco-data
+      - name: alfresco-log
+        persistentVolumeClaim:
+          claimName: alfresco-log
+---

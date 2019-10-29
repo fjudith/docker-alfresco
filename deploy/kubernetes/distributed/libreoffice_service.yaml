@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: libreoffice
+  namespace: alfresco
+  labels:
+    app: alfresco
+    tiers: converter
+spec:
+  type: ClusterIP
+  ports:
+  - name: libreoffice
+    port: 8100
+    targetPort: 8100
+    protocol: TCP
+  selector:
+    app: alfresco
+    tiers: converter
+  type: ClusterIP
+---

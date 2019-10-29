@@ -1,0 +1,16 @@
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: alfresco-data
+  namespace: alfresco
+  labels:
+    app: alfresco
+spec:
+  # storageClassName: ''
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---

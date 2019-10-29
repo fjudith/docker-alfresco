@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: libreoffice
+  namespace: alfresco
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alfresco
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: alfresco
+        tiers: converter
+    spec:
+      containers:
+      - image: fjudith/alfresco:libreoffice
+        name: libreoffice
+        ports:
+        - containerPort: 8100
+          name: libreoffice
+---
