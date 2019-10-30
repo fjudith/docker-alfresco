@@ -55,7 +55,7 @@ spec:
         name: alfresco-db
       spec:
         accessModes: [ "ReadWriteMany"]
-        storageClassName: 'rook-ceph-block'
+        # storageClassName: ''
         resources:
           requests:
             storage: 10Gi

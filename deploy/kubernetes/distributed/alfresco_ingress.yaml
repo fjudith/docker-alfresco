@@ -1,13 +1,16 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: gateway
+  name: alfresco
   namespace: alfresco
   annotations:
-    kubernetes.io/ingress.class: "nginx"
+    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/ingress.class: nginx
+    kubernetes.io/tls-acme: "true"
 spec:
   rules:
-  - http:
+  - host: alfresco.weavelab.io
+    http:
       paths:
       - path: /share
         backend:
@@ -17,3 +20,7 @@ spec:
         backend:
           serviceName: repository
           servicePort: 8080
+  tls:
+  - hosts:
+    - alfresco.weavelab.io
+    secretName: alfresco-prod-cert

@@ -5,6 +5,7 @@ metadata:
   namespace: alfresco
   labels:
     app: alfresco
+    tiers: search-index
 spec:
   # storageClassName: ''
   accessModes:
@@ -20,6 +21,7 @@ metadata:
   namespace: alfresco
   labels:
     app: alfresco
+    tiers: search-archive
 spec:
   # storageClassName: ''
   accessModes:
@@ -35,6 +37,7 @@ metadata:
   namespace: alfresco
   labels:
     app: alfresco
+    tiers: search-contentstore
 spec:
   # storageClassName: ''
   accessModes:

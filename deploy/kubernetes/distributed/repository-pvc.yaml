@@ -6,6 +6,7 @@ metadata:
   namespace: alfresco
   labels:
     app: alfresco
+    tiers: repository
 spec:
   # storageClassName: ''
   accessModes:
