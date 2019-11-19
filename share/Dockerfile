@@ -24,8 +24,10 @@ RUN set -x && \
     apt-get install -y --no-install-recommends \
         dnsutils \
         netcat \
-        xmlstarlet
-
+        xmlstarlet && \
+    apt-get autoremove -y --purge && \
+    apt-get clean && \
+    rm -r /var/lib/apt/lists/*
 
 # Download Alfresco Module Management
 WORKDIR /root
@@ -131,11 +133,6 @@ RUN sed -i 's#^\(handlers = \).*$#\11catalina.org.apache.juli.FileHandler, 2loca
     sed -i 's#^\(org.apache.catalina.core.ContainerBase.\[Catalina\].\[localhost\].handlers = \).*$#\12localhost.org.apache.juli.FileHandler, java.util.logging.ConsoleHandler#g' conf/logging.properties && \
     sed -i 's#^\(org.apache.catalina.core.ContainerBase.\[Catalina\].\[localhost\].\[/manager\].handlers = \).*$#\13manager.org.apache.juli.FileHandler, java.util.logging.ConsoleHandler#g' conf/logging.properties && \
     sed -i 's#^\(org.apache.catalina.core.ContainerBase.\[Catalina\].\[localhost\].\[/host-manager\].handlers = \).*$#\14host-manager.org.apache.juli.FileHandler, java.util.logging.ConsoleHandler#g' conf/logging.properties
-
-
-# Cleanup
-RUN apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
 
 WORKDIR ${CATALINA_HOME}
 #WORKDIR /root

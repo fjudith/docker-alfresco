@@ -22,8 +22,11 @@ RUN set -x && \
         procps \
         libgtk2.0-0 \
         libxtst6 \
-        lsof 
-
+        lsof \
+        unzip \
+    apt-get autoremove -y --purge && \
+    apt-get clean && \
+    rm -r /var/lib/apt/lists/*
 
 # Deploy Alfresco Platform in Tomcat
 WORKDIR /usr/share
