@@ -42,23 +42,20 @@ RUN apt-get update -yqq && \
         fonts-freefont-otf \
         fonts-freefont-ttf \
         fonts-liberation \
-        ttf-liberation
-
+        ttf-liberation && \
+    apt-get autoremove -y --purge && \
+    apt-get clean && \
+    rm -r /var/lib/apt/lists/*
 
 # Download & install Libreoffice
 WORKDIR /tmp
 RUN set -x && \
     curl --silent --location \
-        ${REPO}/${LIBREOFFICE_PATCH_VERSION}/deb/x86_64/LibreOffice_${LIBREOFFICE_PATCH_VERSION}_Linux_x86-64_deb.tar.gz | tar xvz
-
-RUN dpkg -R --install LibreOffice_${LIBREOFFICE_RELEASE_VERSION}_Linux_x86-64_deb/DEBS/ && \
+        ${REPO}/${LIBREOFFICE_PATCH_VERSION}/deb/x86_64/LibreOffice_${LIBREOFFICE_PATCH_VERSION}_Linux_x86-64_deb.tar.gz | tar xvz && \
+    dpkg -R --install LibreOffice_${LIBREOFFICE_RELEASE_VERSION}_Linux_x86-64_deb/DEBS/ && \
     chown -R libreoffice:libreoffice ${LIBREOFFICE_PATH} && \
-    ln -s ${LIBREOFFICE_PATH} /opt/libreoffice
-
-# Cleanup
-RUN apt-get clean && \
-    rm -rf /var/lib/apt/lists/* \
-    /tmp/LibreOffice_${LIBREOFFICE_RELEASE_VERSION}_Linux_x86-64_deb
+    ln -s ${LIBREOFFICE_PATH} /opt/libreoffice && \
+    rm -rf /tmp/LibreOffice_${LIBREOFFICE_RELEASE_VERSION}_Linux_x86-64_deb
 
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
