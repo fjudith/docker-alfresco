@@ -54,8 +54,8 @@ spec:
     - metadata:
         name: alfresco-db
       spec:
-        accessModes: [ "ReadWriteMany"]
-        storageClassName: ''
+        accessModes: [ "ReadWriteOnce"]
+        # storageClassName: ''
         resources:
           requests:
             storage: 10Gi
