@@ -1,0 +1,196 @@
+# fly -t concourse set-pipeline --config './concourse.yaml' --pipeline 'docker-draw.io' -v 'docker-hub-email=<email>' -v 'docker-hub-username=<username>' -v 'docker-hub-password=<password>' -v 'docker-hub-repo=<organisation>'
+resources:
+  - name: version
+    type: semver
+    icon: git
+    source:
+      driver: git
+      uri: https://github.com/fjudith/docker-alfresco.git
+      branch: master
+      file: VERSION
+  
+  - name: docker-alfresco
+    type: git
+    icon: git
+    source:
+      uri: https://github.com/fjudith/docker-alfresco.git
+      branch: master
+  
+  - name: repository
+    type: registry-image
+    icon: docker 
+    source:
+      username: ((docker-hub-username))
+      password: ((docker-hub-password))
+      repository: ((docker-hub-repo))/alfresco-repository
+      tag: latest
+
+  - name: share
+    type: registry-image
+    icon: docker 
+    source:
+      username: ((docker-hub-username))
+      password: ((docker-hub-password))
+      repository: ((docker-hub-repo))/alfresco-share
+      tag: latest
+
+  - name: libreoffice
+    type: registry-image
+    icon: docker 
+    source:
+      username: ((docker-hub-username))
+      password: ((docker-hub-password))
+      repository: ((docker-hub-repo))/alfresco-libreoffice
+      tag: latest
+
+  - name: search
+    type: registry-image
+    icon: docker 
+    source:
+      username: ((docker-hub-username))
+      password: ((docker-hub-password))
+      repository: ((docker-hub-repo))/alfresco-search
+      tag: latest
+
+jobs:
+  - name: write-additional-tags
+    public: true
+    plan:
+      - get: version
+        trigger: true
+      - task: write-additional-tags
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source: { repository: busybox }
+          inputs:
+              - name: version
+          run:
+            path: sh
+            args:
+              - -ec
+              - |
+                echo "$(cat version/version)-repository" | tee additionnal_tags/repository_version
+                echo "$(cat version/version)-search" | tee additionnal_tags/search_version
+                echo "$(cat version/version)-libreoffice" | tee additionnal_tags/libreoffice_version
+                echo "$(cat version/version)-share" | tee additionnal_tags/share_version
+          outputs:
+            - name: additionnal_tags
+     
+  - name: alfresco-repository
+    public: true
+    plan:
+    - get: version
+      passed: [write-additional-tags]
+      trigger: true
+    - get: docker-alfresco
+    - task: build
+      privileged: true
+      config:
+        platform: linux
+        image_resource:
+          type: registry-image
+          source:
+            repository: dullest/oci-build-task
+            # repository: vito/oci-build-task
+        params:
+          CONTEXT: ./docker-alfresco/repository/
+          DOCKERFILE: ./docker-alfresco/repository/Dockerfile
+        inputs:
+          - name: docker-alfresco
+          - name: additionnal_tags
+        outputs:
+          - name: image
+        run:
+          path: build
+    - put: repository
+      params: {image: image/image.tar, additional_tags: additionnal_tags/repository_version}
+
+  - name: alfresco-share
+    public: true
+    plan:
+    - get: version
+      passed: [write-additional-tags]
+      trigger: true
+    - get: docker-alfresco
+    - task: build
+      privileged: true
+      config:
+        platform: linux
+        image_resource:
+          type: registry-image
+          source:
+            repository: dullest/oci-build-task
+            # share: vito/oci-build-task
+        params:
+          CONTEXT: ./docker-alfresco/share/
+          DOCKERFILE: ./docker-alfresco/share/Dockerfile
+        inputs:
+          - name: docker-alfresco
+          - name: additionnal_tags
+        outputs:
+          - name: image
+        run:
+          path: build
+    - put: share
+      params: {image: image/image.tar, additional_tags: additionnal_tags/share_version}
+
+  - name: alfresco-search
+    public: true
+    plan:
+    - get: version
+      passed: [write-additional-tags]
+      trigger: true
+    - get: docker-alfresco
+    - task: build
+      privileged: true
+      config:
+        platform: linux
+        image_resource:
+          type: registry-image
+          source:
+            repository: dullest/oci-build-task
+            # search: vito/oci-build-task
+        params:
+          CONTEXT: ./docker-alfresco/search/
+          DOCKERFILE: ./docker-alfresco/search/Dockerfile
+        inputs:
+          - name: docker-alfresco
+          - name: additionnal_tags
+        outputs:
+          - name: image
+        run:
+          path: build
+    - put: search
+      params: {image: image/image.tar, additional_tags: additionnal_tags/search_version}
+
+  - name: alfresco-libreoffice
+    public: true
+    plan:
+    - get: version
+      passed: [write-additional-tags]
+      trigger: true
+    - get: docker-alfresco
+    - task: build
+      privileged: true
+      config:
+        platform: linux
+        image_resource:
+          type: registry-image
+          source:
+            repository: dullest/oci-build-task
+            # libreoffice: vito/oci-build-task
+        params:
+          CONTEXT: ./docker-alfresco/libreoffice/
+          DOCKERFILE: ./docker-alfresco/libreoffice/Dockerfile
+        inputs:
+          - name: docker-alfresco
+          - name: additionnal_tags
+        outputs:
+          - name: image
+        run:
+          path: build
+    - put: libreoffice
+      params: {image: image/image.tar, additional_tags: additionnal_tags/libreoffice_version}
+
