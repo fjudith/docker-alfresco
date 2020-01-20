@@ -1,2 +1,3 @@
 kubernetes/my.*
 docker-build.sh
+**/.strippedpassword.txt
