@@ -8,9 +8,9 @@ env:
   - OOO=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "libreoffice"; else echo ${TRAVIS_BRANCH}-libreoffice ; fi`
   - SEARCH=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "search"; else echo ${TRAVIS_BRANCH}-search ; fi`
   - SHA=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "share"; else echo ${TRAVIS_BRANCH}-share ; fi`
-
   # Retreive commit ID
   - COMMIT=${TRAVIS_COMMIT::8}
+
 sudo: required
 services:
   - docker
