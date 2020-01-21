@@ -68,8 +68,12 @@ jobs:
         - docker build -f slim/Dockerfile -t ${REG}:${COMMIT} slim/
         - docker run --name 'mysql' -d -p 32731:3306 -e MYSQL_ROOT_PASSWORD=secret -e MYSQL_DATABASE=alfresco -e MYSQL_USER=alfresco -e MYSQL_PASSWORD=secret mysql --character-set-server=utf8 --collation-server=utf8_general_ci --max_connections=1024
         - docker run --name 'alfresco' -d -p 32732:8080 --link mysql:mysql ${REG}:${COMMIT}
+        # Wait for alfresco to start
+        - sleep 300
         - DOCKER_ALF=`docker ps -qa -f ancestor=${REG}:${COMMIT}`
+        # Show logs
         - docker logs $DOCKER_ALF
+        # Container inter-networking test
         - docker exec ${DOCKER_ALF} /bin/bash -c "curl -i -X GET -u admin:admin http://localhost:8080/alfresco/service/api/audit/control"
         - curl -iL -X GET -u admin:admin http://localhost:32732/share/page
       after_sucess:
