@@ -25,7 +25,6 @@ jobs:
       script:
         # Build Alfresco micro-services
         - docker-compose up --build -d
-        - sleep 300
         # Wait for alfresco to start
         - sleep 300
         - DOCKER_REPO=`docker ps -qa -f ancestor=${REG}:repository`
