@@ -18,7 +18,8 @@ services:
 jobs:
   include:
     - stage: Build
-      env: 
+      env:
+        - EDITION=distributed
         - HTTP_PORT=8080
         - SEARCH_PORT=8083
       script:
@@ -65,6 +66,7 @@ jobs:
         - docker push ${REG}
     - stage: Build
       env:
+        - EDITION=monolithic
         - HTTP_PORT=8080
       script:
         # Build Alfresco slim
