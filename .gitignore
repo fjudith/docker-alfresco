@@ -1,3 +1,6 @@
 kubernetes/my.*
 docker-build.sh
 **/.strippedpassword.txt
+
+# Concourse variables
+*.vars
