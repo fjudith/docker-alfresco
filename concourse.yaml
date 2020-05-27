@@ -1,4 +1,4 @@
-# fly -t concourse set-pipeline --config './concourse.yaml' --pipeline 'docker-draw.io' --load-vars-from ./concourse.vars
+# fly -t concourse set-pipeline --config './concourse.yaml' --pipeline 'docker-alfresco' --load-vars-from ./concourse.vars
 resources:
   - name: version
     type: semver
