@@ -1,0 +1,7 @@
+registry-username: username
+registry-password: Ch4ng3m3
+registry-repo: docker.io/repository
+s3-endpoint: http://minio.minio.svc.cluster.local:9000
+s3-bucket: concourse
+s3-access-key: 4cc3ssK3y
+s3-secret-key: S3cr3tK3y
