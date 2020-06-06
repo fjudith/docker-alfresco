@@ -192,8 +192,8 @@ SMTP-PLAIN (smtp), SMTP-SSL (smtps) and SMTP-STARTTLS methods are supported.
 | `MAIL_ENCODING`             | message encoding                                       | `UTF-8`      | 
 | `MAIL_FROM_DEFAULT_ENABLED` | enable email notification using default ip address     | `false`      | 
 | `MAIL_FROM_DEFAULT`         | sender email address                                   | `alfresco@alfresco.org` |
-| `MAIL_SMTP_USERNAME`        | user to connect the SMTP server                        |  _empty_     |
-| `MAIL_SMTP_PASSWORD`        | password to connect the SMTP server                    |  _empty_     |
+| `MAIL_SMTP_USERNAME`        | user to connect the SMTP server                        |  `alfreco`    |
+| `MAIL_SMTP_PASSWORD`        | password to connect the SMTP server                    |  `password`    |
 | `MAIL_SMTP_AUTH`            | enable smtp authentification                           |  `false`     |
 | `MAIL_SMTP_STARTTLS`        | enable STARTTLS on smtp protocol (explicit ssl)        |  `false`     |
 | `MAIL_SMTPS_AUTH`           | enable smtps authentification                          |  `false`     |
