@@ -208,7 +208,7 @@ Unlock Alfresco capability to send an email notification once the engine success
 | Name                        | Description                                            | Default      |
 | --------------------------- | ------------------------------------------------------ | ------------ |
 | `MAIL_TESTMESSAGE_SEND`     | enable smtp notification debugging                     | `false`      | 
-| `MAIL_TESTMESSAGE_TO`       | startup notification receiver address                  | _empty_      | 
+| `MAIL_TESTMESSAGE_TO`       | startup notification receiver address                  | `alfresco@locahost`     | 
 | `MAIL_TESTMESSAGE_SUBJECT`  | subject of the test message                            | `Alfresco - Service - Engine online` | 
 | `MAIL_TESTMESSAGE_TEXT`     | subject of the test message                            | `Alfresco engine initialized and ready to accept connection` | 
 
